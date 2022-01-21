@@ -1,0 +1,9 @@
+{
+  "version": 2,
+  "projects": {
+    "api": "apps/api",
+    "api-interfaces": "libs/api-interfaces",
+    "split-window": "apps/split-window",
+    "split-window-e2e": "apps/split-window-e2e"
+  }
+}

@@ -1,0 +1,96 @@
+{
+  "projectType": "application",
+  "root": "apps/split-window",
+  "sourceRoot": "apps/split-window/src",
+  "prefix": "repo20220121",
+  "targets": {
+    "build": {
+      "executor": "@angular-devkit/build-angular:browser",
+      "outputs": ["{options.outputPath}"],
+      "options": {
+        "outputPath": "dist/apps/split-window",
+        "index": "apps/split-window/src/index.html",
+        "main": "apps/split-window/src/main.ts",
+        "polyfills": "apps/split-window/src/polyfills.ts",
+        "tsConfig": "apps/split-window/tsconfig.app.json",
+        "assets": [
+          "apps/split-window/src/favicon.ico",
+          "apps/split-window/src/assets"
+        ],
+        "styles": ["apps/split-window/src/styles.css"],
+        "scripts": []
+      },
+      "configurations": {
+        "production": {
+          "budgets": [
+            {
+              "type": "initial",
+              "maximumWarning": "500kb",
+              "maximumError": "1mb"
+            },
+            {
+              "type": "anyComponentStyle",
+              "maximumWarning": "2kb",
+              "maximumError": "4kb"
+            }
+          ],
+          "fileReplacements": [
+            {
+              "replace": "apps/split-window/src/environments/environment.ts",
+              "with": "apps/split-window/src/environments/environment.prod.ts"
+            }
+          ],
+          "outputHashing": "all"
+        },
+        "development": {
+          "buildOptimizer": false,
+          "optimization": false,
+          "vendorChunk": true,
+          "extractLicenses": false,
+          "sourceMap": true,
+          "namedChunks": true
+        }
+      },
+      "defaultConfiguration": "production"
+    },
+    "serve": {
+      "executor": "@angular-devkit/build-angular:dev-server",
+      "configurations": {
+        "production": {
+          "browserTarget": "split-window:build:production"
+        },
+        "development": {
+          "browserTarget": "split-window:build:development"
+        }
+      },
+      "defaultConfiguration": "development",
+      "options": {
+        "proxyConfig": "apps/split-window/proxy.conf.json"
+      }
+    },
+    "extract-i18n": {
+      "executor": "@angular-devkit/build-angular:extract-i18n",
+      "options": {
+        "browserTarget": "split-window:build"
+      }
+    },
+    "lint": {
+      "executor": "@nrwl/linter:eslint",
+      "options": {
+        "lintFilePatterns": [
+          "apps/split-window/src/**/*.ts",
+          "apps/split-window/src/**/*.html"
+        ]
+      }
+    },
+    "test": {
+      "executor": "@nrwl/jest:jest",
+      "outputs": ["coverage/apps/split-window"],
+      "options": {
+        "jestConfig": "apps/split-window/jest.config.js",
+        "passWithNoTests": true
+      }
+    }
+  },
+  "tags": []
+}
