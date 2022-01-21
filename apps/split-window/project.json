@@ -6,7 +6,9 @@
   "targets": {
     "build": {
       "executor": "@angular-devkit/build-angular:browser",
-      "outputs": ["{options.outputPath}"],
+      "outputs": [
+        "{options.outputPath}"
+      ],
       "options": {
         "outputPath": "dist/apps/split-window",
         "index": "apps/split-window/src/index.html",
@@ -17,7 +19,10 @@
           "apps/split-window/src/favicon.ico",
           "apps/split-window/src/assets"
         ],
-        "styles": ["apps/split-window/src/styles.css"],
+        "styles": [
+          "./node_modules/@angular/material/prebuilt-themes/indigo-pink.css",
+          "apps/split-window/src/styles.css"
+        ],
         "scripts": []
       },
       "configurations": {
@@ -85,10 +90,47 @@
     },
     "test": {
       "executor": "@nrwl/jest:jest",
-      "outputs": ["coverage/apps/split-window"],
+      "outputs": [
+        "coverage/apps/split-window"
+      ],
       "options": {
         "jestConfig": "apps/split-window/jest.config.js",
         "passWithNoTests": true
+      }
+    },
+    "storybook": {
+      "executor": "@nrwl/storybook:storybook",
+      "options": {
+        "uiFramework": "@storybook/angular",
+        "port": 4400,
+        "config": {
+          "configFolder": "apps/split-window/.storybook"
+        },
+        "projectBuildConfig": "split-window"
+      },
+      "configurations": {
+        "ci": {
+          "quiet": true
+        }
+      }
+    },
+    "build-storybook": {
+      "executor": "@nrwl/storybook:build",
+      "outputs": [
+        "{options.outputPath}"
+      ],
+      "options": {
+        "uiFramework": "@storybook/angular",
+        "outputPath": "dist/storybook/split-window",
+        "config": {
+          "configFolder": "apps/split-window/.storybook"
+        },
+        "projectBuildConfig": "split-window"
+      },
+      "configurations": {
+        "ci": {
+          "quiet": true
+        }
       }
     }
   },
