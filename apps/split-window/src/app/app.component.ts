@@ -11,4 +11,7 @@ export class AppComponent {
   // hello$ = this.http.get<Message>('/api/hello');
   progress = 0;
   // constructor(private http: HttpClient) {}
+  onSelectedTemplate(ev : any) {
+    console.log(' AppComponent onSelectedTemplate ev', ev);
+  }
 }

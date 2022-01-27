@@ -3,6 +3,7 @@
   "projects": {
     "api": "apps/api",
     "api-interfaces": "libs/api-interfaces",
+    "data": "libs/data",
     "split-window": "apps/split-window",
     "split-window-e2e": "apps/split-window-e2e"
   }

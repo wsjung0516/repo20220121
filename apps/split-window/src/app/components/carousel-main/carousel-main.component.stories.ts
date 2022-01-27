@@ -1,6 +1,6 @@
 import { moduleMetadata, Story, Meta } from '@storybook/angular';
 import { CarouselMainComponent } from './carousel-main.component';
-import {AngularMaterials} from "../../../../shared/angular-materials";
+import {AngularMaterialsModule} from "../../../../shared/angular-materials.module";
 import {HttpClientModule} from "@angular/common/http";
 
 export default {
@@ -8,7 +8,7 @@ export default {
   component: CarouselMainComponent,
   decorators: [
     moduleMetadata({
-      imports: [AngularMaterials],
+      imports: [AngularMaterialsModule],
     })
   ],
 } as Meta<CarouselMainComponent>;

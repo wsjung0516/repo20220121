@@ -1,5 +1,5 @@
 import { moduleMetadata, Story, Meta } from '@storybook/angular';
-import {AngularMaterials} from "../../../../shared/angular-materials";
+import {AngularMaterialsModule} from "../../../../shared/angular-materials.module";
 import {DisplayImageComponent} from "./display-image.component";
 
 export default {
@@ -7,7 +7,7 @@ export default {
   component: DisplayImageComponent,
   decorators: [
     moduleMetadata({
-      imports: [AngularMaterials],
+      imports: [AngularMaterialsModule],
     })
   ],
 } as Meta<DisplayImageComponent>;

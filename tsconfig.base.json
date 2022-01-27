@@ -18,7 +18,8 @@
     "strictNullChecks": false,
     "strictPropertyInitialization": false,
     "paths": {
-      "@repo20220121/api-interfaces": ["libs/api-interfaces/src/index.ts"]
+      "@repo20220121/api-interfaces": ["libs/api-interfaces/src/index.ts"],
+      "@repo20220121/data": ["libs/data/src/index.ts"]
     }
   },
   "exclude": ["node_modules", "tmp"]
