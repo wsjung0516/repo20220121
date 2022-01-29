@@ -1,5 +1,6 @@
 import { State, Action, Selector, StateContext } from '@ngxs/store';
 import {
+  SelectedGridTemplate,
   SetActiveSplit, SetCategoryList,
   SetCurrentCategory, SetCurrentSplitOperation, SetFocusedSplit,
   SetImageUrls,
@@ -18,8 +19,12 @@ import {Injectable} from "@angular/core";
 import {ImageModel} from "@repo20220121/data";
 // import {ImageModel} from "../../app/carousel/carousel-main/carousel-main.component";
 // import {SeriesModel} from "../../app/thumbnail/series-list/series-list.component";
-
+export interface ISelectedGridTemplate {
+  templateName: string,
+  button: 'left' | 'right'
+}
 export interface StatusStateModel {
+  selectedGridTemplate: ISelectedGridTemplate;
   items: string[];
   isImageLoaded: {} ; // from 0
   isSeriesLoaded: boolean;
@@ -43,6 +48,7 @@ export interface StatusStateModel {
 @State<StatusStateModel>({
   name: 'status',
   defaults: {
+    selectedGridTemplate: {templateName: '', button: 'left'},
     items: [],
     isImageLoaded: { idx: 0},
     isSeriesLoaded: false,
@@ -74,6 +80,10 @@ export interface StatusStateModel {
 @Injectable()
 export class StatusState {
 
+  @Selector()
+  public static getSelectedGridTemplate(state: StatusStateModel) {
+    return state.selectedGridTemplate;
+  }
   @Selector()
   public static getState(state: StatusStateModel) {
     return state;
@@ -147,6 +157,12 @@ export class StatusState {
     return state.activeSplit;
   }
 
+  @Action(SelectedGridTemplate)
+  public selectedGridTemplate(ctx: StateContext<StatusStateModel>, { payload }: SelectedGridTemplate) {
+    const stateModel = ctx.getState();
+    stateModel.selectedGridTemplate = payload;
+    ctx.setState(stateModel);
+  }
   @Action(StatusAction)
   public add(ctx: StateContext<StatusStateModel>, { payload }: StatusAction) {
     const stateModel = ctx.getState();

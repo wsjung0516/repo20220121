@@ -33,8 +33,8 @@ import {StatusState} from "../../../../state/status/status.state";
       background: antiquewhite;
     }
     .selected_item {
-      width: 98px;
-      height:68px;
+      width: auto;
+      height: 68px;
       border: red solid 4px ;
     }
   `],
@@ -53,16 +53,6 @@ export class ThumbnailItemComponent implements OnInit, AfterViewInit {
   constructor(
     private cdr: ChangeDetectorRef
   ) {
-/*
-    this.selectedImageId  = {
-      imageId: 1,
-      category: 'animal',
-      url: '',
-      blob: '',
-      title: ''
-    }
-    localStorage.setItem('selectedImageId', JSON.stringify(this.selectedImageId))
-*/
   }
 
   ngOnInit(): void {

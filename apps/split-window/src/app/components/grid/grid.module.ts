@@ -9,19 +9,15 @@ import {BrowserAnimationsModule} from "@angular/platform-browser/animations";
 import {BrowserModule} from "@angular/platform-browser";
 import {SelectColorDirective} from "./grid-directives/select-color.directive";
 import { GridMenuComponent } from './grid-menu/grid-menu.component';
-import { ToolbarComponent } from './toolbar.component';
-/*
-import {GridTemplateComponent} from "./grid-template/grid-template.component";
-import {AngularMaterials} from "../../../../shared/angular-materials";
-import {GridTemplateDirective} from "./grid-directives/grid-template.directive";
-import {SelectColorDirective} from "./grid-directives/select-color.directive";
-*/
+import { ToolbarComponent } from './toolbar/toolbar.component';
+import {NgxsModule, StateStream, Store} from "@ngxs/store";
+import {StatusState} from "../../../state/status/status.state";
+import {InternalStateOperations} from "@ngxs/store/src/internal/state-operations";
 
 @NgModule({
   declarations: [
     GridTemplateDirective,
     GridTemplateComponent,
-    // GridComponent,
     SelectColorDirective,
     DisplayGridComponent,
     DisplayGridTemplateComponent,
@@ -33,17 +29,18 @@ import {SelectColorDirective} from "./grid-directives/select-color.directive";
     BrowserAnimationsModule,
     BrowserModule,
     AngularMaterialsModule,
-
+    NgxsModule.forRoot(),
+    NgxsModule.forFeature([StatusState])
   ],
   exports: [
     GridTemplateDirective,
     GridTemplateComponent,
-    // GridComponent,
     SelectColorDirective,
     DisplayGridComponent,
     DisplayGridTemplateComponent,
     GridMenuComponent,
     ToolbarComponent
-  ]
+  ],
+  // providers: [Store, StateStream, InternalStateOperations]
 })
 export class GridModule { }

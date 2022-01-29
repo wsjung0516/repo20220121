@@ -9,7 +9,7 @@ import {Component, EventEmitter, OnInit, Output} from '@angular/core';
         <div class="flex-end mx-3 mt-2">
           <div class="tool-bar">
             <ng-container>
-              <grid-menu (selectMode)="onSelectMenu($event)"></grid-menu>
+              <grid-menu (selectMode)="selectMode.emit($event)"></grid-menu>
             </ng-container>
           </div>
         </div>
@@ -30,7 +30,7 @@ import {Component, EventEmitter, OnInit, Output} from '@angular/core';
   ]
 })
 export class ToolbarComponent implements OnInit {
-  @Output() onSelectMode = new EventEmitter<any>();
+  @Output() selectMode = new EventEmitter<any>();
   constructor() { }
 
   ngOnInit(): void {

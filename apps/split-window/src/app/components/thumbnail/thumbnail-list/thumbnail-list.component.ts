@@ -19,7 +19,7 @@ export class CustomVirtualScrollStrategy extends FixedSizeVirtualScrollStrategy 
 @Component({
   selector: 'thumbnail-list',
   template: `
-    <div class="">
+    <div class="mt-1">
       <div class="cdk-scroll-source" style="width: 99%">
         <cdk-virtual-scroll-viewport
           class="cdk-scroll-viewport"
@@ -62,7 +62,7 @@ export class ThumbnailListComponent implements OnInit {
   ngOnInit(): void {
   }
   onSelectItem(ev:ImageModel) {
-    // console.log( '--- thumbnail-list id', ev.imageId )
+    // console.log( '--- thumbnail-list id', ev )
     localStorage.setItem('selectedImageId', JSON.stringify(ev));
     /**
      * To synchronize with the current selected item, after when it is activated by clicking item-list

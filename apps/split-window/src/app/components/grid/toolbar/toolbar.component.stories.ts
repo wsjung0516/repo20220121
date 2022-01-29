@@ -1,5 +1,5 @@
 import {Meta, moduleMetadata, Story} from "@storybook/angular";
-import {GridModule} from "./grid.module";
+import {GridModule} from "../grid.module";
 import {action} from "@storybook/addon-actions";
 import {ToolbarComponent} from "./toolbar.component";
 

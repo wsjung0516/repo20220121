@@ -1,12 +1,7 @@
 import {Component, OnDestroy, OnInit, QueryList, TemplateRef, ViewChildren} from '@angular/core';
 import {GridTemplateDirective} from "../grid-directives/grid-template.directive";
-// import {StatusState} from "../../../store/status/status.state";
-// import {Select, Store} from "@ngxs/store";
-// import {takeUntil} from "rxjs/operators";
-// import {SplitService} from "../split.service";
-// import {SelectSnapshot} from "@ngxs-labs/select-snapshot";
-// import {CarouselService} from "../../carousel/carousel.service";
-// import {SetFocusedSplit, SetSplitAction} from "../../../store/status/status.actions";
+import {StateStream, Store} from "@ngxs/store";
+import {SelectedGridTemplate} from "../../../../state/status/status.actions";
 
 @Component({
   selector: 'app-grid-template',
@@ -104,18 +99,19 @@ import {GridTemplateDirective} from "../grid-directives/grid-template.directive"
     .fab-bottom-left {
       position: absolute;
       left: 16px;
-      top: 50%;
-      bottom: 50%;
+      top: 45%;
+      bottom: 55%;
       z-index: 100;
     }
     .fab-bottom-right {
       position: absolute;
       right: 16px;
-      top: 50%;
-      bottom: 50%;
+      top: 45%;
+      bottom: 55%;
       z-index: 100;
     }
-  `]
+  `],
+   // providers: [Store]
 })
 export class GridTemplateComponent{
 
@@ -123,7 +119,7 @@ export class GridTemplateComponent{
   selectedSplit: any[] = [];
   constructor(
     // private carouselService: CarouselService,
-    // private store: Store,
+    private store: Store,
     // private splitService: SplitService
   ) {}
 
@@ -138,14 +134,15 @@ export class GridTemplateComponent{
     this.carouselService.getPrevImage(this.currentCategory, element);
     this.store.dispatch(new SetFocusedSplit(idx));
 */
-
+    this.store.dispatch(new SelectedGridTemplate({templateName: element, button: 'left'}));
   }
   onRightArrowButton(element: string) {
 /*
     this.store.dispatch(new SetSplitAction(false));
-    const idx = this.splitService.elements.findIndex(val => val === element);
     this.carouselService.getNextImage(this.currentCategory, element);
+    const idx = this.splitService.elements.findIndex(val => val === element);
     this.store.dispatch(new SetFocusedSplit(idx));
 */
+    this.store.dispatch(new SelectedGridTemplate({templateName: element, button: 'right'}));
   }
 }

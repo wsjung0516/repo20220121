@@ -3,7 +3,12 @@
 
 // @ts-ignore
 import {ImageModel} from "@repo20220121/data";
+import {ISelectedGridTemplate} from "./status.state";
 
+export class SelectedGridTemplate {
+  public static readonly type = 'Selected Grid Template by arrow button';
+  constructor(public payload: ISelectedGridTemplate) { }
+}
 export class StatusAction {
   public static readonly type = '[Status] Add item';
   constructor(public payload: string) { }

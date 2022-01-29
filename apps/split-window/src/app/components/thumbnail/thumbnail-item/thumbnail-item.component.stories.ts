@@ -1,11 +1,6 @@
 import {ThumbnailItemComponent} from "./thumbnail-item.component";
 import {Meta, moduleMetadata, Story} from "@storybook/angular";
 import {ThumbnailModule} from "../thumbnail.module";
-import {NgxsModule, StateStream, Store} from "@ngxs/store";
-import {StatusState} from "../../../../state/status/status.state";
-import {InternalStateOperations} from "@ngxs/store/src/internal/state-operations";
-import {userEvent} from "@storybook/testing-library";
-import {NgxsSelectSnapshotModule} from "@ngxs-labs/select-snapshot";
 import {action} from "@storybook/addon-actions";
 
 export default {
@@ -41,6 +36,20 @@ Default.args = {
     title: ''
   },
 }
+const initial_value = {
+  imageId: 1,
+  category: 'animal',
+  url: '',
+  blob: 'assets/sample_images/128.png',
+  title: ''
+}
+function initialize () {
+  localStorage.setItem('selectedImageId', JSON.stringify(initial_value));
+}
+Default.play = async () => {
+  await initialize();
+}
+
 export const SelectedItem = Template.bind({});
 SelectedItem.args = {
   originalImage: {

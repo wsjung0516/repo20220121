@@ -8,3 +8,9 @@ export interface ImageModel {
   blob: any,
   title: string
 }
+export interface SeriesModel {
+  seriesId: number;
+  url: string;
+  blob: string;
+  category: string
+}
