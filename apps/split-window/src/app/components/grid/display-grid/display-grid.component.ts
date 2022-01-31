@@ -37,7 +37,6 @@ export interface Tile {
                                    [templateHeight]="tile.mheight">
             </display-grid-template>
           </div>
-
         </mat-grid-tile>
       </mat-grid-list>
     </div>

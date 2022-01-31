@@ -151,5 +151,17 @@ SelectSeries_3.args = {
       blob: 'assets/sample_images/104.jpg',
       category: 'animal'
     },
+    {
+      seriesId: 6,
+      url: '',
+      blob: 'assets/sample_images/105.jpg',
+      category: 'animal'
+    },
+    {
+      seriesId: 7,
+      url: '',
+      blob: 'assets/sample_images/106.jpg',
+      category: 'animal'
+    },
   ]
 }

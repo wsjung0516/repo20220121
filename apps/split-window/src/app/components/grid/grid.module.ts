@@ -12,7 +12,6 @@ import { GridMenuComponent } from './grid-menu/grid-menu.component';
 import { ToolbarComponent } from './toolbar/toolbar.component';
 import {NgxsModule, StateStream, Store} from "@ngxs/store";
 import {StatusState} from "../../../state/status/status.state";
-import {InternalStateOperations} from "@ngxs/store/src/internal/state-operations";
 
 @NgModule({
   declarations: [
@@ -41,6 +40,5 @@ import {InternalStateOperations} from "@ngxs/store/src/internal/state-operations
     GridMenuComponent,
     ToolbarComponent
   ],
-  // providers: [Store, StateStream, InternalStateOperations]
 })
 export class GridModule { }

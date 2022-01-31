@@ -15,8 +15,9 @@ import {SeriesModel} from "@repo20220121/data";
 @Component({
   selector: 'series-list',
   template: `
-    <div class="">
-      <div class="cdk-scroll-source" style="width: 98%">
+<!--     <div class="cdk-scroll-source" style="width: 98%">-->
+    <div class="h-40">
+      <div class="cdk-scroll-source w-auto">
         <cdk-virtual-scroll-viewport itemSize="90"
                                      class="cdk-scroll-viewport"
                                      orientation="vertical"

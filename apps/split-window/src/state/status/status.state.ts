@@ -158,10 +158,10 @@ export class StatusState {
   }
 
   @Action(SelectedGridTemplate)
-  public selectedGridTemplate(ctx: StateContext<StatusStateModel>, { payload }: SelectedGridTemplate) {
-    const stateModel = ctx.getState();
-    stateModel.selectedGridTemplate = payload;
-    ctx.setState(stateModel);
+  public selectedGridTemplate({patchState, getState}: StateContext<StatusStateModel>, { payload }: SelectedGridTemplate) {
+    const obj = getState().selectedGridTemplate;
+    // console.log(' payload', payload)
+    patchState({selectedGridTemplate: {...obj, ...payload}});
   }
   @Action(StatusAction)
   public add(ctx: StateContext<StatusStateModel>, { payload }: StatusAction) {

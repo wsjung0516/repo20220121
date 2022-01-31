@@ -26,42 +26,14 @@ const Template: Story<HomeComponent> = (args) => ({
     onSelectSeries: action('selectSeries')
   },
   template: `
-    <grid-toolbar (selectMode)="onSelectMode($event)"></grid-toolbar>
-    <div class="w-screen">
-      <div class="h-24">
-        <div class="bg-blue-200">
-          <div class="">
-            <thumbnail-list [currentImages]="currentImages"
-                            [selectedImage]="selectedImage"
-            >
-            </thumbnail-list>
-          </div>
-        </div>
-      </div>
-      <div class="h-auto ">
-        <div class="mt-1">
-          <!--      <app-carousel-main [queryUrl]="queryUrl"></app-carousel-main>-->
-          <div class="grid grid-cols-10 gap-2">
-            <div class="h-auto col-span-1 bg-blue-100">
-              <h2 class="mx-3 mt-2">Category</h2>
-              <series-list [currentSeries]="currentSeries"
-                            [selectedSeries]="selectedSeries"
-                            (selectSeries)="onSelectSeries($event)">
-              </series-list>
-            </div>
-            <div class="h-auto col-span-9 bg-red-100">
-<!--              <app-grid></app-grid>-->
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
+  <home></home>
         `
 })
 
 export const Default = Template.bind({});
 export const WithThumbnailList = Template.bind({});
 WithThumbnailList.args = {
+  splitMode: 4,
   currentImages: [
     {
       imageId: 1,
@@ -135,6 +107,18 @@ WithThumbnailList.args = {
       seriesId: 5,
       url: '',
       blob: 'assets/sample_images/104.jpg',
+      category: 'animal'
+    },
+    {
+      seriesId: 6,
+      url: '',
+      blob: 'assets/sample_images/105.jpg',
+      category: 'animal'
+    },
+    {
+      seriesId: 7,
+      url: '',
+      blob: 'assets/sample_images/106.jpg',
       category: 'animal'
     },
   ],
