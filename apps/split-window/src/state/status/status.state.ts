@@ -55,6 +55,7 @@ export interface StatusStateModel {
     imageUrls: [],
     seriesUrls: [],
     currentCategory: '',
+    //category_list:['animal', 'house', 'baby','forest', 'happiness', 'love','sea','banana' ],
     category_list:['animal', 'house', 'baby', 'forest', 'happiness', 'love', 'sea','banana', 'mountain'],
     focusedSplit: 0, // 0: split1, 1: split2, 2: split3, 3: split4
     selectedImageId: {

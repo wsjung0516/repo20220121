@@ -3,11 +3,11 @@ import { BrowserModule } from '@angular/platform-browser';
 
 import { AppComponent } from './app.component';
 import { HttpClientModule } from '@angular/common/http';
-import {CarouselModule} from "./components/carousel-main/carousel.module";
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import {NgxsModule, Store} from "@ngxs/store";
 import {NgxsSelectSnapshotModule} from "@ngxs-labs/select-snapshot";
 import {HomeModule} from "./components/home/home.module";
+import {CarouselModule} from "./components/carousel/carousel.module";
 
 @NgModule({
   declarations: [AppComponent],

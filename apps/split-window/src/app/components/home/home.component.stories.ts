@@ -4,6 +4,7 @@ import {HomeModule} from "./home.module";
 import {ThumbnailModule} from "../thumbnail/thumbnail.module";
 import {SeriesModule} from "../series/series.module";
 import {action} from "@storybook/addon-actions";
+import {HttpClientModule} from "@angular/common/http";
 
 export default {
   title: 'Home',
@@ -13,7 +14,8 @@ export default {
       declarations: [],
       imports: [HomeModule,
         ThumbnailModule,
-        SeriesModule
+        SeriesModule,
+        HttpClientModule
       ]
     })
   ]
@@ -78,50 +80,52 @@ WithThumbnailList.args = {
     blob: 'assets/sample_images/101.jpg',
     title: ''
   },
-  currentSeries: [
-    {
-      seriesId: 1,
-      url: '',
-      blob: 'assets/sample_images/100.jpg',
-      category: 'animal'
-    },
-    {
-      seriesId: 2,
-      url: '',
-      blob: 'assets/sample_images/101.jpg',
-      category: 'animal'
-    },
-    {
-      seriesId: 3,
-      url: '',
-      blob: 'assets/sample_images/102.jpg',
-      category: 'animal'
-    },
-    {
-      seriesId: 4,
-      url: '',
-      blob: 'assets/sample_images/103.jpg',
-      category: 'animal'
-    },
-    {
-      seriesId: 5,
-      url: '',
-      blob: 'assets/sample_images/104.jpg',
-      category: 'animal'
-    },
-    {
-      seriesId: 6,
-      url: '',
-      blob: 'assets/sample_images/105.jpg',
-      category: 'animal'
-    },
-    {
-      seriesId: 7,
-      url: '',
-      blob: 'assets/sample_images/106.jpg',
-      category: 'animal'
-    },
-  ],
+  currentSeries: {
+    seriesList: [
+      {
+        seriesId: 1,
+        url: '',
+        blob: 'assets/sample_images/100.jpg',
+        category: 'animal'
+      },
+      {
+        seriesId: 2,
+        url: '',
+        blob: 'assets/sample_images/101.jpg',
+        category: ''
+      },
+      {
+        seriesId: 3,
+        url: '',
+        blob: 'assets/sample_images/102.jpg',
+        category: ''
+      },
+      {
+        seriesId: 4,
+        url: '',
+        blob: 'assets/sample_images/103.jpg',
+        category: ''
+      },
+      {
+        seriesId: 5,
+        url: '',
+        blob: 'assets/sample_images/104.jpg',
+        category: ''
+      },
+      {
+        seriesId: 6,
+        url: '',
+        blob: 'assets/sample_images/105.jpg',
+        category: ''
+      },
+      {
+        seriesId: 7,
+        url: '',
+        blob: 'assets/sample_images/106.jpg',
+        category: ''
+      },
+    ]
+  },
   selectedSeries: {
     seriesId: 1,
     url: '',

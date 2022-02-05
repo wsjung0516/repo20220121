@@ -22,10 +22,8 @@ import {SelectedGridTemplate} from "../../../../state/status/status.actions";
             <mat-icon>keyboard_arrow_right</mat-icon>
           </button>
         </div>
-<!--
-        <app-carousel-main [queryElement]="'element1'">  &lt;!&ndash; to make observable of making split window &ndash;&gt;
+        <app-carousel-main [queryElement]="'element1'">  <!-- to make observable of making split window -->
         </app-carousel-main>
--->
       </div>
     </ng-template>
     <ng-template [appGridTemplate]="'element2'" let-height=height>

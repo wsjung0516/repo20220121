@@ -20,10 +20,12 @@ const Template: Story<ThumbnailItemComponent> = (args) => ({
     onSelected: action('selected')
   },
   template: `
-    <thumbnail-item [addClass]="addClass"
-                    [originalImage]="originalImage"
-                    (selected)="onSelected($event)">
-    </thumbnail-item>
+    <div class="w-24">
+      <thumbnail-item [addClass]="addClass"
+                      [originalImage]="originalImage"
+                      (selected)="onSelected($event)">
+      </thumbnail-item>
+    </div>
   `
 });
 export const Default = Template.bind({});

@@ -4,6 +4,7 @@ import { HomeComponent } from './home.component';
 import {GridModule} from "../grid/grid.module";
 import {ThumbnailModule} from "../thumbnail/thumbnail.module";
 import {SeriesModule} from "../series/series.module";
+import {NgxsSelectSnapshotModule} from "@ngxs-labs/select-snapshot";
 
 @NgModule({
   declarations: [
@@ -13,7 +14,7 @@ import {SeriesModule} from "../series/series.module";
     CommonModule,
     GridModule,
     ThumbnailModule,
-    SeriesModule
+    SeriesModule,
   ],
   exports: [
     HomeComponent,

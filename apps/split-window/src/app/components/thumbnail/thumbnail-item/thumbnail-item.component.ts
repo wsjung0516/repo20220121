@@ -60,6 +60,7 @@ export class ThumbnailItemComponent implements OnInit, AfterViewInit {
   }
   ngAfterViewInit() {
     // @ts-ignore
+    console.log(' thumbnail-item -- category',this.originalImage.category)
     this.image.nativeElement.src = this.originalImage.blob;
     this.cdr.markForCheck();
   }

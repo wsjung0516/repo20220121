@@ -20,19 +20,23 @@ const Template: Story<SeriesItemComponent> = (args) => ({
     onSelected: action('selected')
   },
   template: `
-    <series-item [addClass]="addClass"
-                    [seriesImage]="seriesImage"
-                    (selected)="onSelected($event)">
-    </series-item>
+    <div class="w-36">
+      <series-item [addClass]="addClass"
+                      [seriesImage]="seriesImage"
+                      (selected)="onSelected($event)">
+      </series-item>
+    </div>
   `
 });
 export const Default = Template.bind({});
 Default.args = {
   seriesImage: {
-    seriesId: 0,
-    url: '',
-    blob: 'assets/sample_images/128.png',
-    category: 'animal'
+    series: {
+      seriesId: 0,
+      url: '',
+      blob: 'assets/sample_images/128.png',
+      category: 'animal'
+    }
   },
 }
 const initial_value = {
@@ -50,10 +54,12 @@ Default.play = async () => {
 export const SelectedSeries = Template.bind({});
 SelectedSeries.args = {
   seriesImage: {
-    seriesId: 1,
-    url: '',
-    blob: 'assets/sample_images/128.png',
-    category: 'animal'
+    series: {
+      seriesId: 1,
+      url: '',
+      blob: 'assets/sample_images/128.png',
+      category: 'animal'
+    }
   },
   addClass: 'aa'
 }

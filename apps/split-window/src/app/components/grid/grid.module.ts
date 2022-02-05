@@ -12,6 +12,8 @@ import { GridMenuComponent } from './grid-menu/grid-menu.component';
 import { ToolbarComponent } from './toolbar/toolbar.component';
 import {NgxsModule, StateStream, Store} from "@ngxs/store";
 import {StatusState} from "../../../state/status/status.state";
+import {NgxsSelectSnapshotModule} from "@ngxs-labs/select-snapshot";
+import {CarouselModule} from "../carousel/carousel.module";
 
 @NgModule({
   declarations: [
@@ -23,14 +25,15 @@ import {StatusState} from "../../../state/status/status.state";
     GridMenuComponent,
     ToolbarComponent
   ],
-  imports: [
-    CommonModule,
-    BrowserAnimationsModule,
-    BrowserModule,
-    AngularMaterialsModule,
-    NgxsModule.forRoot(),
-    NgxsModule.forFeature([StatusState])
-  ],
+    imports: [
+        CommonModule,
+        BrowserAnimationsModule,
+        BrowserModule,
+        AngularMaterialsModule,
+        NgxsModule.forRoot(),
+        NgxsModule.forFeature([StatusState]),
+        CarouselModule,
+    ],
   exports: [
     GridTemplateDirective,
     GridTemplateComponent,
