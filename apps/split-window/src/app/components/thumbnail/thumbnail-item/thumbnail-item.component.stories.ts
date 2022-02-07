@@ -31,35 +31,41 @@ const Template: Story<ThumbnailItemComponent> = (args) => ({
 export const Default = Template.bind({});
 Default.args = {
   originalImage: {
-    imageId: 0,
-    category: 'animal',
-    url: '',
-    blob: 'assets/sample_images/128.png',
-    title: ''
+    item: {
+      imageId: 0,
+      category: 'animal',
+      url: '',
+      blob: 'assets/sample_images/128.png',
+      title: ''
+    }
   },
 }
 const initial_value = {
-  imageId: 1,
-  category: 'animal',
-  url: '',
-  blob: 'assets/sample_images/128.png',
-  title: ''
-}
-function initialize () {
-  localStorage.setItem('selectedImageId', JSON.stringify(initial_value));
-}
-Default.play = async () => {
-  await initialize();
-}
-
-export const SelectedItem = Template.bind({});
-SelectedItem.args = {
-  originalImage: {
+  item: {
     imageId: 1,
     category: 'animal',
     url: '',
     blob: 'assets/sample_images/128.png',
     title: ''
+  }
+}
+function initialize () {
+  localStorage.setItem('selectedImageId', JSON.stringify(initial_value));
+}
+
+export const SelectedItem = Template.bind({});
+SelectedItem.args = {
+  originalImage: {
+    item: {
+      imageId: 1,
+      category: 'animal',
+      url: '',
+      blob: 'assets/sample_images/128.png',
+      title: ''
+    }
   },
   addClass: 'aa'
+}
+SelectedItem.play = async () => {
+  await initialize();
 }

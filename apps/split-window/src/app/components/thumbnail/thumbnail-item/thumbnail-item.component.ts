@@ -20,8 +20,8 @@ import {StatusState} from "../../../../state/status/status.state";
   selector: 'thumbnail-item',
   template: `
     <div class="mr-1">
-      <div class="{{borderColor}}" (click)="selected.emit(originalImage)">
-        <img #img >
+      <div class="{{borderColor}}" (click)="selected.emit(_originalImage)">
+        <img  #img >
       </div>
     </div>
   `,
@@ -45,10 +45,17 @@ export class ThumbnailItemComponent implements OnInit, AfterViewInit {
   @Input() set addClass( v: any){
     this.cdr.markForCheck();
   }
-  @Input() originalImage: ImageModel;
+  @Input() set originalImage (v : any ) {
+    this._originalImage = v.item;
+    if( this.image && this.image.nativeElement) {
+      console.log(' thumbnail_item originalImage',v.item)
+      this.image.nativeElement.src = this._originalImage.blob;
+      this.cdr.markForCheck();
+    }
+  }
   @Output() selected: EventEmitter<ImageModel> = new EventEmitter<ImageModel>();
-  // @SelectSnapshot(StatusState.getSelectedImageById) selectedImageId: ImageModel;
   borderColor!: string ;
+  _originalImage: any;
   selectedImageId: ImageModel | undefined;
   constructor(
     private cdr: ChangeDetectorRef
@@ -60,8 +67,8 @@ export class ThumbnailItemComponent implements OnInit, AfterViewInit {
   }
   ngAfterViewInit() {
     // @ts-ignore
-    console.log(' thumbnail-item -- category',this.originalImage.category)
-    this.image.nativeElement.src = this.originalImage.blob;
+    console.log(' thumbnail-item -- category',this._originalImage.category)
+    this.image.nativeElement.src = this._originalImage.blob;
     this.cdr.markForCheck();
   }
   ngOnChanges(changes: SimpleChanges) {
@@ -69,10 +76,12 @@ export class ThumbnailItemComponent implements OnInit, AfterViewInit {
     this.cdr.markForCheck();
 
     // @ts-ignore
-    this.selectedImageId = JSON.parse(localStorage.getItem('selectedImageId'));
-    // console.log('this.selectedImageId, this.originalImage.imageId ', this.selectedImageId, this.originalImage, changes)
+    // console.log('localStorage.getItem', localStorage.getItem('selectedImageId'))
+    this.selectedImageId = JSON.parse(localStorage.getItem('selectedImageId')).item;
+    // console.log('this.selectedImageId, this.originalImage.imageId ', this.selectedImageId, this._originalImage, changes)
     if( changes['addClass'] && changes['addClass'].currentValue) {
-      if( this.selectedImageId.imageId === this.originalImage.imageId) {
+      // @ts-ignore
+      if( this.selectedImageId && this.selectedImageId.imageId === this._originalImage.imageId) {
         this.borderColor = 'selected_item';
         this.cdr.markForCheck();
       } else {

@@ -1,10 +1,10 @@
 import {
   ChangeDetectionStrategy,
   ChangeDetectorRef,
-  Component,
+  Component, EventEmitter,
   Injectable,
   Input,
-  OnInit,
+  OnInit, Output,
   ViewChild
 } from '@angular/core';
 import {SetSelectedImageById, SetSplitAction} from "../../../../state/status/status.actions";
@@ -15,9 +15,6 @@ import {
   FixedSizeVirtualScrollStrategy,
   VIRTUAL_SCROLL_STRATEGY
 } from "@angular/cdk/scrolling";
-import {Select, Store} from "@ngxs/store";
-import {Observable, Subject, takeUntil} from "rxjs";
-import {StatusState} from "../../../../state/status/status.state";
 @Injectable()
 export class CustomVirtualScrollStrategy extends FixedSizeVirtualScrollStrategy {
   constructor() {
@@ -35,7 +32,7 @@ export class CustomVirtualScrollStrategy extends FixedSizeVirtualScrollStrategy 
         <cdk-virtual-scroll-viewport
           class="cdk-scroll-viewport"
           orientation="horizontal" >
-          <ng-container *cdkVirtualFor="let item of currentImages">
+          <ng-container *cdkVirtualFor="let item of _currentImages">
             <thumbnail-item [originalImage]="item"
                             [addClass]="addClass"
                             (selected) = onSelectItem($event)>
@@ -62,53 +59,41 @@ export class CustomVirtualScrollStrategy extends FixedSizeVirtualScrollStrategy 
 
 })
 export class ThumbnailListComponent implements OnInit {
-  @Input() set selectedImage (v: ImageModel){
-    this.onSelectItem(v);
+  @Input() set selectedImage (v: any){
+    console.log(' selectedImage',v)
+    v && this.onSelectItem(v.item);
   };
-  @Input() currentImages: ImageModel[] | undefined;
+  @Input() set currentImages (im:  any) {
+    console.log('----------',im)
+    this._currentImages = im;
+  }
+  @Output() selectItem = new EventEmitter<any>();
   @ViewChild(CdkVirtualScrollViewport, { static: true }) viewPort: CdkVirtualScrollViewport | undefined;
-  @Select(StatusState.getSelectedImageById)  getSelectedImageById$: Observable<ImageModel>;
-  unsubscribe = new Subject();
-  unsubscribe$ = this.unsubscribe.asObservable();
+  _currentImages: any;
   addClass: {} = {};
   constructor(
     private cdr: ChangeDetectorRef,
-    private store: Store
   ) { }
 
   ngOnInit(): void {
     const initial_value = {
-      imageId: 0,
-      category: 'animal',
-      url: '',
-      blob: 'assets/sample_images/100.jpg',
-      title: ''
+      item: {
+        imageId: 1,
+        category: 'animal',
+        url: '',
+        blob: 'assets/sample_images/100.jpg',
+        title: ''
+      }
     }
     localStorage.setItem('selectedImageId', JSON.stringify(initial_value));
     ///
-    /**
-     * Triggered from series-list.component ( onSelectSeries),
-     *      carousel.service (getPrevImage, getNextImage)
-     */
-    this.getSelectedImageById$.pipe(
-      takeUntil(this.unsubscribe$)
-    ).subscribe( image => {
-      this.addClass = {
-        class:'selected_item',
-        imageId: image.imageId
-      }
-      this.cdr.detectChanges();
-      // To synchronize with the current selected item, after when it is activated by clicking item-list
-      setTimeout(() => this.viewPort.scrollToIndex(image.imageId, 'smooth'),200);
-    })
-
   }
   onSelectItem(ev:ImageModel) {
     if( !ev) return;
 
-    // console.log( '--- thumbnail-list id', ev )
-    localStorage.setItem('selectedImageId', JSON.stringify(ev));
-    this.store.dispatch(new SetSelectedImageById(ev));
+    console.log( '--- thumbnail-list id', ev )
+    localStorage.setItem('selectedImageId', JSON.stringify({item:ev}));
+    this.selectItem.emit(ev); // send to home.component
     /**
      * To synchronize with the current selected item, after when it is activated by clicking item-list
      * */
@@ -119,11 +104,5 @@ export class ThumbnailListComponent implements OnInit {
         index: ev.imageId
       }
     },200);
-    this.store.dispatch(new SetSplitAction(false));
-
-  }
-  ngOnDestroy() {
-    this.unsubscribe.next({});
-    this.unsubscribe.complete();
   }
 }

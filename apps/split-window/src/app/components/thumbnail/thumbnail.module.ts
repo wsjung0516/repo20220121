@@ -18,6 +18,8 @@ import { SelectThumbnailComponent } from './select-thumbnail/select-thumbnail.co
   imports: [
     CommonModule,
     AngularMaterialsModule,
+    NgxsModule.forRoot(),
+    NgxsModule.forFeature([StatusState]),
   ],
   exports: [
     ThumbnailItemComponent,

@@ -1,4 +1,4 @@
-import {ChangeDetectorRef, Component, OnDestroy, OnInit} from '@angular/core';
+import {ChangeDetectionStrategy, ChangeDetectorRef, Component, OnDestroy, OnInit} from '@angular/core';
 // @ts-ignore
 import {ImageModel, SeriesModel} from "@repo20220121/data";
 import {ISelectedGridTemplate, StatusState} from "../../../state/status/status.state";
@@ -10,9 +10,13 @@ import {ImageService} from "../../services/image.service";
 import {SeriesItemService} from "../series/series-item.service";
 import {
   SetCurrentCategory,
-  SetFocusedSplit, SetIsImageLoaded,
-  SetIsSeriesLoaded, SetSelectedImageById, SetSelectedSeriesById,
-  SetSeriesUrls, SetSplitAction
+  SetFocusedSplit,
+  SetIsImageLoaded,
+  SetIsSeriesLoaded,
+  SetSelectedImageById,
+  SetSelectedSeriesById,
+  SetSeriesUrls,
+  SetSplitAction
 } from "../../../state/status/status.actions";
 import {skip, tap} from "rxjs/operators";
 import {SelectSnapshot} from "@ngxs-labs/select-snapshot";
@@ -28,6 +32,7 @@ import {SplitService} from "../../services/split.service";
           <div class="">
             <thumbnail-list [currentImages]="currentImages"
                             [selectedImage]="selectedImage"
+                            (selectItem)="onSelectItem($event)"
             >
             </thumbnail-list>
           </div>
@@ -52,10 +57,12 @@ import {SplitService} from "../../services/split.service";
       </div>
     </div>
   `,
-  styles: []
+  styles: [],
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class HomeComponent implements OnInit, OnDestroy {
-  currentImages: ImageModel[] | undefined;
+  // currentImages: ImageModel[] | undefined;
+  currentImages: any[];
   selectedImage: ImageModel;
   currentSeries: {seriesList: SeriesModel[]};
   // currentSeries: SeriesModel[] |  undefined;
@@ -122,11 +129,15 @@ export class HomeComponent implements OnInit, OnDestroy {
       blob: '',
       title: ''
     }
-    this.store.dispatch(new SetSelectedImageById(image));
+    // this.store.dispatch(new SetSelectedImageById(image));
     // Enable display the first image in the main window
     this.store.dispatch(new SetIsImageLoaded({idx: 0}));
   }
-
+  onSelectItem( ev: any) {
+    console.log('select item',ev);
+    this.store.dispatch(new SetSelectedImageById(ev));
+    // this.store.dispatch(new SetSplitAction(false));
+  }
   onSelectMode( ev: any) {
     console.log(' splitMode', ev);
     this.splitMode = ev.mode;
@@ -142,16 +153,26 @@ export class HomeComponent implements OnInit, OnDestroy {
       this.category = val;
       // console.log('-- category -1', val)
     });
-    this.currentImages = [];
+/*
+    this.getImageUrls$.pipe(
+      takeUntil(this.unsubscribe$),
+      map( v => this.imageService.cachedThumbnailImages.map(v => v.image)),
+      filter( (f: any) => f.category === this.category),
+      map( (v: any) => {
+        return {item : v}
+      })
+    ).subscribe();
+*/
     this.getImageUrls$.pipe(
       takeUntil(this.unsubscribe$),
     ).subscribe(() => {
+      this.currentImages = [];
       this.currentImages = this.imageService.cachedThumbnailImages.map(val => val.image)
-        .filter(val => {
-          // console.log(' -----val', val);
-          return val.category === this.category
+        .filter(val =>  val.category === this.category)
+        .map( (v: any) => {
+          return {item: v}
         });
-
+        // this.cdr.detectChanges();
          console.log('this.currentImages -2', this.category, this.currentImages)
     });
     /**
@@ -181,6 +202,7 @@ export class HomeComponent implements OnInit, OnDestroy {
         this.currentSeries = {seriesList:[]} ;
         // this.cacheSeriesService.cachedSeries.map( v => this.currentSeries.seriesList.push(v));
         this.currentSeries.seriesList = [...this.cacheSeriesService.cachedSeries]
+        this.cdr.detectChanges();
         // console.log(' this.currentSeries', this.currentSeries)
       })
     ).subscribe()
