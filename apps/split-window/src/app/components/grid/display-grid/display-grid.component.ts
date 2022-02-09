@@ -1,6 +1,6 @@
 import {
   AfterViewInit,
-  ChangeDetectionStrategy,
+  ChangeDetectionStrategy, ChangeDetectorRef,
   Component,
   EventEmitter,
   Input,
@@ -34,7 +34,8 @@ export interface Tile {
                (selectTemplate) = "clickSelectTemplate($event)"
                 style="width: 100%; height: 100%">
             <display-grid-template [templateName]="tile.templateName"
-                                   [templateHeight]="tile.mheight">
+                                   [templateHeight]="tile.mheight"
+                                   [selectedTemplate]="selectedTemplate">
             </display-grid-template>
           </div>
         </mat-grid-tile>
@@ -46,7 +47,7 @@ export interface Tile {
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class DisplayGridComponent {
-  @Output() onSelectTemplate = new EventEmitter<any>();
+  @Output() selectTpl = new EventEmitter<any>();
   @Input() set splitMode ( val: number) {
     if (val === 1) {
       this.tiles = [...this.tiles1];
@@ -59,9 +60,8 @@ export class DisplayGridComponent {
     }
     this.mcols = this.tiles[this.tiles.length - 1].mcols;
     this.mheight = this.tiles[this.tiles.length - 1].mheight;
-    // console.log(' mcols mheight', this.mcols, this.mheight)
-
     // this.store.dispatch(new SetSplitAction(true));
+    this.cdr.detectChanges();
   }
   mcols = 1;
   mheight = '82vh';
@@ -87,8 +87,9 @@ export class DisplayGridComponent {
 
   selectedTemplate: string = this.tiles[0].templateName;
 
-  constructor() {
+  constructor( private cdr: ChangeDetectorRef) {
   }
+
   clickSelectTemplate(ev?: any) {
     this.selectedTemplate = ev;
     let idx;
@@ -96,7 +97,7 @@ export class DisplayGridComponent {
     if( ev === 'element2' ) idx = 1;
     if( ev === 'element3' ) idx = 2;
     if( ev === 'element4' ) idx = 3;
-    this.onSelectTemplate.emit({element: ev, idx});
+    this.selectTpl.emit({element: ev, idx});
     // this.store.dispatch(new SetFocusedSplit(idx));
     // this.store.dispatch(new SetSplitAction(false));
     //

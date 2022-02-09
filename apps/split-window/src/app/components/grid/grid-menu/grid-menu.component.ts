@@ -4,10 +4,9 @@ import {Component, EventEmitter, OnInit, Output} from '@angular/core';
   selector: 'grid-menu',
   template: `
     <button mat-icon-button [matMenuTriggerFor]="menu3" aria-label="split" id="icon_split"
-            class="tools-btn expanded-menu" [ngClass]="isAriaExpandedForCaret('icon_split')">
+            class="tools-btn expanded-menu" >
       <img src="{{isAriaExpanded('icon_split')}}" title="Split Window" alt="Split Window"
            class="tools-icon-button">
-      <i class="fa fa-caret-down fa-xs caret-down dropdown"></i>
     </button>
     <mat-menu #menu3="matMenu">
       <button mat-menu-item (click)="onClickWindowSplit(1)">
@@ -64,20 +63,15 @@ export class GridMenuComponent implements OnInit {
   }
   onClickWindowSplit(no: number) {
     this.selectMode.emit({mode: no});
+    const element = document.getElementById('icon_split');
+    element.setAttribute('aria-expanded','false');
   }
   isAriaExpanded( id: string) {
     const element = document.getElementById(id)
     const x = element?.getAttribute('aria-expanded');
-
     return x === 'true'?
       `assets/icon_split/${id}_black.svg`
       : `assets/icon_split/${id}_white.svg`;
 
-  }
-  isAriaExpandedForCaret(id:string) {
-    const element = document.getElementById(id);
-    const x = element?.getAttribute('aria-expanded');
-
-    return x === 'true'? {'selectedBtn': true} : {'selectedBtn': false};
   }
 }

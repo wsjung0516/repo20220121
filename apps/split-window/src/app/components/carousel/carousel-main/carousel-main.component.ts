@@ -62,6 +62,7 @@ export interface ImageModel {
 })
 export class CarouselMainComponent implements OnInit, AfterViewInit, OnDestroy {
   @Input() set queryElement(el: string) {
+    // console.log('carousel-main input queryElement', el)
     let idx;
     if (el === 'element1') idx = 0;
     if (el === 'element2') idx = 1;
@@ -122,6 +123,7 @@ export class CarouselMainComponent implements OnInit, AfterViewInit, OnDestroy {
 
   ngOnInit(): void {
     // call from thumbnail-list, triggered by clicking image item.
+    // console.log('carousel-main Component ngOnInit')
     this.splitWindowProcess1();
     this.splitWindowProcess2()
 
@@ -156,10 +158,10 @@ export class CarouselMainComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   private makingSplitWindowBySelectedSeries(cIdx: number) {
-    // console.log('makingSplitWindowBySelectedSeries ', this.category_list, cIdx, this.categoryIdx)
     this.category = this.category_list[cIdx];
     this._queryUrl = `assets/json/${this.category}.json`;
     this.categoryIdx = this.category_list.findIndex(val => val === this.category);
+    // console.log('makingSplitWindowBySelectedSeries ', this.category_list, cIdx, this.categoryIdx)
     this.makingSplitWindow();
   }
 
@@ -218,7 +220,7 @@ export class CarouselMainComponent implements OnInit, AfterViewInit, OnDestroy {
     })
   }
   private displaySplitWindowImage(image: any) {
-    // console.log('-- this.focusedSplitIdx, this.splitIdx, this.splitAction', this.focusedSplitIdx, this.splitIdx, this.splitAction)
+    console.log('-- displaySplitWindowImage this.focusedSplitIdx, this.splitIdx, this.splitAction', this.focusedSplitIdx, this.splitIdx, this.splitAction)
     if( this.splitIdx !== this.focusedSplitIdx && !this.splitAction) {
       return
     }
@@ -251,9 +253,9 @@ export class CarouselMainComponent implements OnInit, AfterViewInit, OnDestroy {
         const urls = this.imageService.getCacheUrls();
         /** Try to display if there are any cached image before check additional loading  */
         this.store.dispatch(new SetImageUrls([]));
-        // console.log(' val', val)
+        //
         this.checkIfAdditionalLoading(val, category, urls).then((res: any) => {
-          // console.log('-- remained url', res.length)
+          // console.log('-- getTotalImageList remained url', res.length)
           if (res.length > 0) { // If there is remained url that need loading image
             this.imageCount[this.categoryIdx] = res.length;
             /** Send urls for loading images additionally */
@@ -295,13 +297,13 @@ export class CarouselMainComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   private webworkerPostMessage(val: any) {
-    // console.log(' val', val.length)
+    // console.log(' webworkerPostMessage-- val', val, val.length)
     const data: any = {
       msg: 'download',
       body: val,
       category: this.category
     }
-    /** Send additional urls to webworker */
+    /** Send source data to webworker, which is the base data that needs background job */
     if(this.worker[this.splitIdx]) this.worker[this.splitIdx].postMessage(data)
     // this.worker[this.categoryIdx].postMessage(data)
   }
@@ -320,7 +322,7 @@ export class CarouselMainComponent implements OnInit, AfterViewInit, OnDestroy {
     const image = this.carouselService.getPrevImage(this.currentCategory, this.splitService.selectedElement);
     this.displaySplitWindowImage(image);
   }
-  webWorkerProcess() {
+  private webWorkerProcess() {
     if (typeof Worker !== 'undefined') {
       if( !this.worker[this.splitIdx]) {
         // console.log('this.worker[this.splitIdx]', this.worker[this.splitIdx], this.splitIdx)
@@ -333,7 +335,7 @@ export class CarouselMainComponent implements OnInit, AfterViewInit, OnDestroy {
             body: data.data.url,
             category: this.category
           }
-          console.log(' _data',data.data.url)
+          // console.log(' _data1',data.data.url)
           /** Send the signal of completing loading one image of all the images
            * that was sent to webworker as bundle urls
            * This means for being ready to receiving the next image*/
@@ -348,10 +350,10 @@ export class CarouselMainComponent implements OnInit, AfterViewInit, OnDestroy {
       // data is not Blob type.
       return;
     }
-    // console.log('----data- category',data.category)
     const image: any = this.imageService.readFile(data.blob)
     image.subscribe((obj: any) => {
       data.blob = obj;
+      // console.log('---- data2 category', data.imageId, data.category)
       this.saveCacheImage(data);
     })
   }
@@ -417,10 +419,10 @@ export class CarouselMainComponent implements OnInit, AfterViewInit, OnDestroy {
     // console.log(' tempObsevable, rendering$ -1', this.tempObservable, rendering$, this.splitService.selectedElement)
     // 8
     zip(this.tempObservable, rendering$).pipe( // 9
-      tap( val => console.log(' tempObsevable, rendering$ -2', this.tempObservable, rendering$, this.categoryIdx)),
+      // tap( val => console.log(' tempObsevable, rendering$ -2', this.tempObservable, rendering$, this.categoryIdx)),
       take(1),
     ).subscribe(([temp, element]) => {
-      /** Start processing ct-viewer after finished processing for previous split window*/
+      /** Start processing next window after finished processing for previous split window*/
       const idx = this.splitService.elements.findIndex(val => val === element)
       this.splitService.selectedElement = element;
       /** When change split mode, need to set the first signal to prepare processing

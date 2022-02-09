@@ -37,51 +37,53 @@ export const WithThumbnailList = Template.bind({});
 WithThumbnailList.args = {
   splitMode: 4,
   currentImages: [
-    {
+    { item: {
       imageId: 1,
       category: 'animal',
       url: '',
       blob: 'assets/sample_images/100.jpg',
       title: ''
-    },
-    {
+    }},
+    { item: {
       imageId: 2,
       category: 'animal',
       url: '',
       blob: 'assets/sample_images/101.jpg',
       title: ''
-    },
-    {
+    }},
+    { item: {
       imageId: 3,
       category: 'animal',
       url: '',
       blob: 'assets/sample_images/102.jpg',
       title: ''
-    },
-    {
+    }},
+    { item: {
       imageId: 4,
       category: 'animal',
       url: '',
       blob: 'assets/sample_images/103.jpg',
       title: ''
-    },
-    {
+    }},
+    { item: {
       imageId: 5,
       category: 'animal',
       url: '',
       blob: 'assets/sample_images/104.jpg',
       title: ''
-    },
+    }},
   ],
   selectedImage: {
-    imageId: 2,
-    category: 'animal',
-    url: '',
-    blob: 'assets/sample_images/101.jpg',
-    title: ''
+    item: {
+      imageId: 1,
+      category: 'animal',
+      url: '',
+      blob: 'assets/sample_images/101.jpg',
+      title: ''
+    }
   },
   currentSeries: {
-    seriesList: [
+    series: [
       {
         seriesId: 1,
         url: '',
@@ -127,9 +129,11 @@ WithThumbnailList.args = {
     ]
   },
   selectedSeries: {
-    seriesId: 1,
-    url: '',
-    blob: 'assets/sample_images/128.png',
-    category: 'animal'
+    series: {
+      seriesId: 1,
+      url: '',
+      blob: 'assets/sample_images/128.png',
+      category: 'animal'
+    }
   },
 }

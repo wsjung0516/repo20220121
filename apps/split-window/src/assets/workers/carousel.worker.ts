@@ -11,15 +11,17 @@ async function getCarouselImage({data}: any) {
     for (let i = 0; i < rData.length; i++) {
         await axiosCommData(rData[i].url)
           .then( async (res1: any) => {
-            // console.log('----res1', res1)
-            sData = {
-              imageId: rData[i].id,
-              url: rData[i].url,
-              blob: res1.data,
-              category: data.category,
-              title: rData[i].title
+            if( res1.status === 200 ) {
+              // console.log('----res1', i,data.category, res1.status, res1.statusText)
+              sData = {
+                imageId: rData[i].id,
+                url: rData[i].url,
+                blob: res1.data,
+                category: data.category,
+                title: rData[i].title
+              }
+              postMessage(sData,data.origin);
             }
-            postMessage(sData,data.origin);
             await checkIfImageCached( rData[i].url, i);
 
             await sleep(50);

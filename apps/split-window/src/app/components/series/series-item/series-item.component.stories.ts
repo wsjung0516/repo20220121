@@ -40,10 +40,12 @@ Default.args = {
   },
 }
 const initial_value = {
-  seriesId: 1,
-  url: '',
-  blob: 'assets/sample_images/128.png',
-  category: 'animal'
+  series: {
+    seriesId: 1,
+    url: '',
+    blob: 'assets/sample_images/128.png',
+    category: 'animal'
+  }
 }
 function initialize () {
   localStorage.setItem('selectedSeriesId', JSON.stringify(initial_value));

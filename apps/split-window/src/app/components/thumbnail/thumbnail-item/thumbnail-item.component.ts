@@ -38,19 +38,19 @@ import {StatusState} from "../../../../state/status/status.state";
       border: red solid 4px ;
     }
   `],
-  changeDetection: ChangeDetectionStrategy.OnPush
+   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class ThumbnailItemComponent implements OnInit, AfterViewInit {
   @ViewChild('img') image?: ElementRef;
   @Input() set addClass( v: any){
-    this.cdr.markForCheck();
+    this.cdr.detectChanges();
   }
   @Input() set originalImage (v : any ) {
     this._originalImage = v.item;
     if( this.image && this.image.nativeElement) {
-      console.log(' thumbnail_item originalImage',v.item)
+      // console.log(' thumbnail_item originalImage',v.item)
       this.image.nativeElement.src = this._originalImage.blob;
-      this.cdr.markForCheck();
+      this.cdr.detectChanges();
     }
   }
   @Output() selected: EventEmitter<ImageModel> = new EventEmitter<ImageModel>();
@@ -67,7 +67,7 @@ export class ThumbnailItemComponent implements OnInit, AfterViewInit {
   }
   ngAfterViewInit() {
     // @ts-ignore
-    console.log(' thumbnail-item -- category',this._originalImage.category)
+    // console.log(' thumbnail-item -- category',this._originalImage.category)
     this.image.nativeElement.src = this._originalImage.blob;
     this.cdr.markForCheck();
   }
@@ -76,12 +76,12 @@ export class ThumbnailItemComponent implements OnInit, AfterViewInit {
     this.cdr.markForCheck();
 
     // @ts-ignore
-    // console.log('localStorage.getItem', localStorage.getItem('selectedImageId'))
     this.selectedImageId = JSON.parse(localStorage.getItem('selectedImageId')).item;
-    // console.log('this.selectedImageId, this.originalImage.imageId ', this.selectedImageId, this._originalImage, changes)
+    // console.log('data2 this.selectedImageId', this.selectedImageId)
     if( changes['addClass'] && changes['addClass'].currentValue) {
       // @ts-ignore
-      if( this.selectedImageId && this.selectedImageId.imageId === this._originalImage.imageId) {
+      if( this.selectedImageId.imageId === this._originalImage.imageId) {
+      // if( this.selectedImageId && this.selectedImageId.imageId === this._originalImage.imageId) {
         this.borderColor = 'selected_item';
         this.cdr.markForCheck();
       } else {

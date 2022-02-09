@@ -8,7 +8,6 @@ import { Message } from '@repo20220121/api-interfaces';
   styleUrls: ['./app.component.css'],
 })
 export class AppComponent {
-  // hello$ = this.http.get<Message>('/api/hello');
   progress = 0;
   // constructor(private http: HttpClient) {}
   onSelectedTemplate(ev : any) {

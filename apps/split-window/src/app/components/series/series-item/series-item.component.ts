@@ -14,6 +14,7 @@ import {ImageModel, SeriesModel} from "@repo20220121/data";
   selector: 'series-item',
   template: `
     <div class="mb-1 w-auto">
+<!--      <div class="{{borderColor}}" (click)="selected.emit(_seriesImage)">-->
       <div class="{{borderColor}}" (click)="selected.emit(_seriesImage)">
         <img #img>
       </div>
@@ -31,20 +32,21 @@ import {ImageModel, SeriesModel} from "@repo20220121/data";
       border: blue solid 4px ;
     }
   `],
-  changeDetection: ChangeDetectionStrategy.OnPush})
+   changeDetection: ChangeDetectionStrategy.OnPush}
+)
 export class SeriesItemComponent implements  AfterViewInit, OnChanges {
   @ViewChild('img') image?: ElementRef;
   @Input() set seriesImage (v: any) {
-    this._seriesImage = v.series;
+    // console.log(' series_item seriesImage',v)
+    this._seriesImage = v;
     if( this.image) {
-      // console.log(' series_item seriesImage',v.series.seriesId)
       this.image.nativeElement.src = this._seriesImage.blob;
     }
-    this.cdr.markForCheck();
+    this.cdr.detectChanges();
   };
   // @Input() seriesImage: SeriesModel;
   @Input() set addClass( v: any){
-    this.cdr.markForCheck();
+    this.cdr.detectChanges();
   }
   @Output() selected: EventEmitter<any> = new EventEmitter();
   _seriesImage: SeriesModel;
@@ -55,17 +57,19 @@ export class SeriesItemComponent implements  AfterViewInit, OnChanges {
     // console.log(' ---- series_item ngAfterViewInit is called', this.selectedSeriesId.category, this._seriesImage.category);
     this.image.nativeElement.src = this._seriesImage.blob;
   }
-
+  onSelectedSeris(ev: any) {
+    this.selected.emit(ev);
+  }
   ngOnChanges(changes: SimpleChanges) {
     this.borderColor = 'none_selected_item'
     this.cdr.markForCheck();
 
     // @ts-ignore
     const selectedId = localStorage.getItem('selectedSeriesId')
-    this.selectedSeriesId = selectedId && JSON.parse(selectedId);
+    // console.log('selectedId', selectedId, this._seriesImage)
+    this.selectedSeriesId = selectedId && JSON.parse(selectedId).series;
     // console. log('this.selectedImageId, this.originalImage.imageId ', this.selectedSeriesId.category, this._seriesImage.category)
-    if( this.selectedSeriesId && changes['addClass'] && changes['addClass'].currentValue) {
-     // console.log('series_Item changes', changes, this.selectedSeriesId.category, this._seriesImage.category)
+    if( changes['addClass'] && changes['addClass'].currentValue) {
       if( this.selectedSeriesId.category === this._seriesImage.category) {
         this.borderColor = 'selected_item';
         this.cdr.markForCheck();

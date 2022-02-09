@@ -1,10 +1,9 @@
 import {
-  AfterViewInit,
   ChangeDetectionStrategy,
   ChangeDetectorRef,
   Component, EventEmitter,
-  Input, OnChanges,
-  OnInit, Output, SimpleChanges,
+  Input,
+  OnInit, Output,
   ViewChild
 } from '@angular/core';
 import {
@@ -54,12 +53,15 @@ import {Store} from "@ngxs/store";
   ],
   changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class SeriesListComponent implements OnInit, AfterViewInit {
+export class SeriesListComponent implements OnInit {
   _currentSeries : any[];
-  @Input() set selectedSeries (v: SeriesModel){
+  @Input() set selectedSeries (v: any){
     // this.onSelectSeries(v);
   };
   @Input() set currentSeries (se:  any) {
+    if( se ) {
+      this._currentSeries = se.series;
+    }
   }
   @Output() selectSeries = new EventEmitter<any>()
   @ViewChild(CdkVirtualScrollViewport, {static: true}) viewPort: CdkVirtualScrollViewport | undefined;
@@ -72,57 +74,33 @@ export class SeriesListComponent implements OnInit, AfterViewInit {
 ) { }
   ngOnInit(): void {
     const initial_value = {
-      seriesId: 1,
-      url: '',
-      blob: '',
-      category: 'animal'
+      series: {
+        seriesId: 1,
+        url: '',
+        blob: '',
+        category: 'animal'
+      }
     }
     localStorage.setItem('selectedSeriesId', JSON.stringify(initial_value));
   }
   ngAfterViewInit() {
-    console.log('seriesList ngAfterViewInit')
-    this.addClassFn();
-  }
-
-  ngOnChanges(changes: SimpleChanges) {
-    if(changes['currentSeries'] && changes['currentSeries'].currentValue) {
-      const seriesList = changes['currentSeries'].currentValue.seriesList;
-      this._currentSeries = [];
-      seriesList.map((v: SeriesModel) => this._currentSeries.push({series:v}))
-      // console.log('seires-list changes', changes['currentSeries'].currentValue, this._currentSeries)
-       this.addClassFn();
-    }
-  }
-  /**
-   *  Update series item whenever change series list
-   * */
-  private addClassFn(ev?: SeriesModel) {
-    // console.log(' addClassFn',ev?.seriesId)
-    setTimeout(() => {
-      this.addClass = {
-        class: 'selected_item',
-        index: ev?.seriesId
-      }
-      this.viewPort?.scrollToIndex(0, 'smooth')
-      // this.viewPort?.scrollToIndex(ev?.seriesId, 'smooth')
-    }, 200);
-
-    this.cdr.detectChanges();
   }
 
   tmpSeries: any[];
   onSelectSeries(ev: SeriesModel) {
     if( !ev) return;
-    // console.log( '--- onSelectSeries-list id', ev.seriesId )
+    // console.log( '--- onSelectSeries-list id', ev )
     this.selectSeries.emit(ev);
     //
-    this.setSelectedSeriesToTopPosition(ev);
-
-    /**
+    // this.setSelectedSeriesToTopPosition(ev);
+    this.addClass = {
+      class: 'selected_item',
+      index: ev.seriesId
+    }
+    setTimeout(() => this.viewPort.scrollToIndex(ev.seriesId, 'smooth'), 200);    /**
      * To synchronize with the current selected Series, after when it is activated by clicking Series-list
      * */
-    localStorage.setItem('selectedSeriesId', JSON.stringify(ev));
-    this.addClassFn(ev);
+    localStorage.setItem('selectedSeriesId', JSON.stringify({series:ev}));
   }
   /**
    * Assign selected series at the first position
@@ -130,11 +108,11 @@ export class SeriesListComponent implements OnInit, AfterViewInit {
   private setSelectedSeriesToTopPosition(ev: SeriesModel) {
     this.tmpSeries = []
     this.tmpSeries = [...this._currentSeries]
-    const index = this.tmpSeries.findIndex( val => val.series.category === ev.category)
+    const index = this.tmpSeries.findIndex( val => val.category === ev.category)
     let series = this.tmpSeries.splice(index, 1);
     this.tmpSeries.unshift(series[0])
     this._currentSeries = [...this.tmpSeries];
-    const categories = this.tmpSeries.map( v => v.series.category);
+    const categories = this.tmpSeries.map( v => v.category);
     this.store.dispatch( new SetCategoryList(categories))
   }
 }

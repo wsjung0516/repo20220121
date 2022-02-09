@@ -38,7 +38,7 @@ const Template: Story<SeriesListComponent> = (args) => ({
 export const Default = Template.bind({});
 Default.args = {
   currentSeries: {
-    seriesList: [
+    series: [
       {
         seriesId: 1,
         url: '',
@@ -72,10 +72,12 @@ Default.args = {
     ]
   },
   selectedSeries: {
-    seriesId: 0,
-    url: '',
-    blob: 'assets/sample_images/128.png',
-    category: 'animal'
+    series: {
+      seriesId: 0,
+      url: '',
+      blob: 'assets/sample_images/128.png',
+      category: 'animal'
+    }
   },
 
 }
@@ -83,7 +85,7 @@ Default.args = {
 export const SeriesList = Template.bind({});
 SeriesList.args = {
   currentSeries: {
-    seriesList: [
+    series: [
       {
         seriesId: 1,
         url: '',
@@ -129,9 +131,11 @@ SeriesList.args = {
     ]
   },
   selectedSeries: {
-    seriesId: 1,
-    url: '',
-    blob: 'assets/sample_images/128.png',
-    category: 'animal'
+    series: {
+      seriesId: 1,
+      url: '',
+      blob: 'assets/sample_images/128.png',
+      category: 'animal'
+    }
   },
 }

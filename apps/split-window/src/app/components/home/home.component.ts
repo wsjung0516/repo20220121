@@ -3,7 +3,7 @@ import {ChangeDetectionStrategy, ChangeDetectorRef, Component, OnDestroy, OnInit
 import {ImageModel, SeriesModel} from "@repo20220121/data";
 import {ISelectedGridTemplate, StatusState} from "../../../state/status/status.state";
 import {Select, Store} from "@ngxs/store";
-import {Observable, of, Subject, takeUntil} from "rxjs";
+import {Observable, of, startWith, Subject, takeUntil} from "rxjs";
 import {CacheSeriesService} from "../../services/cashe-series.service";
 import {fromWorker} from "observable-webworker";
 import {ImageService} from "../../services/image.service";
@@ -32,15 +32,13 @@ import {SplitService} from "../../services/split.service";
           <div class="">
             <thumbnail-list [currentImages]="currentImages"
                             [selectedImage]="selectedImage"
-                            (selectItem)="onSelectItem($event)"
-            >
+                            (selectItem)="onSelectItem($event)"  >
             </thumbnail-list>
           </div>
         </div>
       </div>
       <div class="h-auto ">
         <div class="mt-1">
-          <!--      <app-carousel-main [queryUrl]="queryUrl"></app-carousel-main>-->
           <div class="grid grid-cols-10 gap-2">
             <div class="h-auto col-span-1 bg-blue-100">
               <h2 class="mx-3 mt-2">Category</h2>
@@ -50,7 +48,9 @@ import {SplitService} from "../../services/split.service";
               </series-list>
             </div>
             <div class="h-auto col-span-9 bg-red-100">
-              <display-grid [splitMode]="splitMode" ></display-grid>
+              <display-grid [splitMode]="splitMode"
+                            (selectTpl)="onSelectTemplate($event)" >
+              </display-grid>
             </div>
           </div>
         </div>
@@ -61,12 +61,10 @@ import {SplitService} from "../../services/split.service";
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class HomeComponent implements OnInit, OnDestroy {
-  // currentImages: ImageModel[] | undefined;
   currentImages: any[];
-  selectedImage: ImageModel;
-  currentSeries: {seriesList: SeriesModel[]};
-  // currentSeries: SeriesModel[] |  undefined;
-  selectedSeries: SeriesModel;
+  selectedImage: any;
+  currentSeries: {series: SeriesModel[]};
+  selectedSeries: any;
   splitMode: number | undefined;
   unsubscribe = new Subject();
   unsubscribe$ = this.unsubscribe.asObservable();
@@ -109,10 +107,16 @@ export class HomeComponent implements OnInit, OnDestroy {
     }
     setTimeout(() => {
       this.selectedSeries = initial_value;
+      /** Default category */
       this.store.dispatch(new SetCurrentCategory('animal'));
     },1000);
   }
-
+  onSelectTemplate( ev: any ) {
+    // {element: 'element4', idx: 3}
+    console.log( ' Home component -- onSelectTemplate',ev)
+    this.store.dispatch(new SetFocusedSplit(ev.idx));
+    this.store.dispatch(new SetSplitAction(false));
+  }
   onSelectSeries(ev: SeriesModel) {
     // console.log('onSelectSeries -2', this.currentSeries );
     this.store.dispatch(new SetSplitAction(false));
@@ -129,23 +133,22 @@ export class HomeComponent implements OnInit, OnDestroy {
       blob: '',
       title: ''
     }
-    // this.store.dispatch(new SetSelectedImageById(image));
+    this.store.dispatch(new SetSelectedImageById(image));
     // Enable display the first image in the main window
     this.store.dispatch(new SetIsImageLoaded({idx: 0}));
   }
   onSelectItem( ev: any) {
-    console.log('select item',ev);
+    // console.log('select item',ev);
     this.store.dispatch(new SetSelectedImageById(ev));
-    // this.store.dispatch(new SetSplitAction(false));
+    this.cdr.detectChanges();
+    this.store.dispatch(new SetSplitAction(false));
   }
   onSelectMode( ev: any) {
     console.log(' splitMode', ev);
     this.splitMode = ev.mode;
-    this.store.dispatch(new SetFocusedSplit(ev.mode));
-    this.store.dispatch(new SetSplitAction(false));
-    //
-    // this.carouselService.getNextImage(this.currentCategory, this.splitService.selectedElement);
+    this.store.dispatch(new SetSplitAction(true));
     this.splitService.selectedElement = ev;
+    this.cdr.detectChanges();
   }
   thumbnailWorkerProcess() {
     // this.getImageUrls$.pipe(
@@ -153,16 +156,6 @@ export class HomeComponent implements OnInit, OnDestroy {
       this.category = val;
       // console.log('-- category -1', val)
     });
-/*
-    this.getImageUrls$.pipe(
-      takeUntil(this.unsubscribe$),
-      map( v => this.imageService.cachedThumbnailImages.map(v => v.image)),
-      filter( (f: any) => f.category === this.category),
-      map( (v: any) => {
-        return {item : v}
-      })
-    ).subscribe();
-*/
     this.getImageUrls$.pipe(
       takeUntil(this.unsubscribe$),
     ).subscribe(() => {
@@ -170,38 +163,20 @@ export class HomeComponent implements OnInit, OnDestroy {
       this.currentImages = this.imageService.cachedThumbnailImages.map(val => val.image)
         .filter(val =>  val.category === this.category)
         .map( (v: any) => {
+          // console.log('this.currentImages -2', this.category, v.imageId)
           return {item: v}
         });
-        // this.cdr.detectChanges();
-         console.log('this.currentImages -2', this.category, this.currentImages)
+        this.cdr.detectChanges();
     });
-    /**
-     * Triggered from series-list.component ( onSelectSeries),
-     *      carousel.service (getPrevImage, getNextImage)
-     */
-/*
-    this.getSelectedImageById$.pipe(
-      takeUntil(this.unsubscribe$)
-    ).subscribe( image => {
-      this.addClass = {
-        class:'selected_item',
-        imageId: image.imageId
-      }
-      this.cdr.detectChanges();
-      // To synchronize with the current selected item, after when it is activated by clicking item-list
-      setTimeout(() => this.viewPort.scrollToIndex(image.imageId, 'smooth'),200);
-    })
-*/
-
   }
   seriesWorkerProcess() {
     this.seriesUrls$.pipe(
       skip(1),
       takeUntil(this.unsubscribe$),
       tap((url) => {
-        this.currentSeries = {seriesList:[]} ;
+        this.currentSeries = {series:[]} ;
         // this.cacheSeriesService.cachedSeries.map( v => this.currentSeries.seriesList.push(v));
-        this.currentSeries.seriesList = [...this.cacheSeriesService.cachedSeries]
+        this.currentSeries.series = [...this.cacheSeriesService.cachedSeries]
         this.cdr.detectChanges();
         // console.log(' this.currentSeries', this.currentSeries)
       })

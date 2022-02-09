@@ -1,4 +1,5 @@
 import {
+  AfterViewInit,
   ChangeDetectionStrategy,
   ChangeDetectorRef,
   Component, EventEmitter,
@@ -58,14 +59,16 @@ export class CustomVirtualScrollStrategy extends FixedSizeVirtualScrollStrategy 
   changeDetection: ChangeDetectionStrategy.OnPush
 
 })
-export class ThumbnailListComponent implements OnInit {
+export class ThumbnailListComponent implements OnInit, AfterViewInit {
   @Input() set selectedImage (v: any){
-    console.log(' selectedImage',v)
-    v && this.onSelectItem(v.item);
+    if( v ) {
+      v && this.onSelectItem(v.item);
+      this.cdr.detectChanges();
+    }
   };
   @Input() set currentImages (im:  any) {
-    console.log('----------',im)
     this._currentImages = im;
+    this.cdr.detectChanges();
   }
   @Output() selectItem = new EventEmitter<any>();
   @ViewChild(CdkVirtualScrollViewport, { static: true }) viewPort: CdkVirtualScrollViewport | undefined;
@@ -86,12 +89,23 @@ export class ThumbnailListComponent implements OnInit {
       }
     }
     localStorage.setItem('selectedImageId', JSON.stringify(initial_value));
+
     ///
   }
+  ngAfterViewInit() {
+    // Because of not focused with red border even though clicking item just after staring.
+    setTimeout(()=> {
+      this.addClass = {
+        class: 'selected_item',
+        index: 1
+      }
+    })
+  }
+
   onSelectItem(ev:ImageModel) {
     if( !ev) return;
 
-    console.log( '--- thumbnail-list id', ev )
+    // console.log( '--- thumbnail-list id', ev )
     localStorage.setItem('selectedImageId', JSON.stringify({item:ev}));
     this.selectItem.emit(ev); // send to home.component
     /**
@@ -103,6 +117,7 @@ export class ThumbnailListComponent implements OnInit {
         class: 'selected_item',
         index: ev.imageId
       }
+      this.cdr.detectChanges();
     },200);
   }
 }
