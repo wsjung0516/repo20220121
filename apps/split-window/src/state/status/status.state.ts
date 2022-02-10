@@ -11,7 +11,7 @@ import {
   SetSelectedSeriesById,
   SetSelectedSplitWindowId, SetSeriesUrls, SetSplitAction,
   SetSplitMode,
-  SetSplitState, SetWebworkerWorkingStatus,
+  SetSplitCategory, SetWebworkerWorkingStatus,
   StatusAction
 } from './status.actions';
 import {Injectable} from "@angular/core";
@@ -36,7 +36,7 @@ export interface StatusStateModel {
   selectedImageId: ImageModel;
   selectedImageUrl: string;
   splitMode: number;
-  splitState: string[];
+  splitCategory: string[];
   splitAction: boolean;
   selectedSeriesById: number;
   selectedSplitWindowId: string;
@@ -67,7 +67,7 @@ export interface StatusStateModel {
     },
     selectedImageUrl: '',
     splitMode: 1, // 1: active --> split1, 2: active --> split1, split2
-    splitState: ['animal', 'house', 'baby', 'forest'],
+    splitCategory: ['animal', 'house', 'baby', 'forest'],
     splitAction: false,
     selectedSeriesById: 0,
     selectedSplitWindowId: 'element1',
@@ -130,8 +130,8 @@ export class StatusState {
     return state.splitMode;
   }
   @Selector()
-  public static getSplitState(state: StatusStateModel) {
-    return state.splitState;
+  public static getSplitCategories(state: StatusStateModel) {
+    return state.splitCategory;
   }
   @Selector()
   public static getSplitAction(state: StatusStateModel) {
@@ -214,13 +214,13 @@ export class StatusState {
   public setSplitMode({patchState,getState}: StateContext<StatusStateModel>, { payload }: SetSplitMode) {
     patchState({splitMode: payload})
   }
-  @Action(SetSplitState)
-  public setSplitState({patchState,getState}: StateContext<StatusStateModel>, { payload }: SetSplitState) {
-    const state = getState().splitState;
+  @Action(SetSplitCategory)
+  public setSplitCategory({patchState,getState}: StateContext<StatusStateModel>, { payload }: SetSplitCategory) {
+    const state = getState().splitCategory;
     const idx = payload.idx;
     const category = payload.category
     state[idx] = category
-    patchState({splitState: [...state]})
+    patchState({splitCategory: [...state]})
   }
   @Action(SetSplitAction)
   public setSplitAction({patchState,getState}: StateContext<StatusStateModel>, { payload }: SetSplitAction) {

@@ -10,13 +10,13 @@ import {ImageService} from "../../services/image.service";
 import {SeriesItemService} from "../series/series-item.service";
 import {
   SetCurrentCategory,
-  SetFocusedSplit,
+  SetFocusedSplit, SetImageUrls,
   SetIsImageLoaded,
   SetIsSeriesLoaded,
-  SetSelectedImageById,
+  SetSelectedImageById, SetSelectedImageByUrl,
   SetSelectedSeriesById,
   SetSeriesUrls,
-  SetSplitAction
+  SetSplitAction, SetSplitCategory
 } from "../../../state/status/status.actions";
 import {skip, tap} from "rxjs/operators";
 import {SelectSnapshot} from "@ngxs-labs/select-snapshot";
@@ -122,12 +122,12 @@ export class HomeComponent implements OnInit, OnDestroy {
     this.store.dispatch(new SetSplitAction(false));
     this.splitService.currentImageIndex[this.splitService.selectedElement] = 0;
     // Setting the current selected category
-    this.store.dispatch(new SetCurrentCategory(ev.category));
+    this.store.dispatch(new SetSplitCategory({idx: 0, category: ev.category}));
     // Select series and get the image list.
     this.store.dispatch(new SetSelectedSeriesById(ev.seriesId));
     // Focusing the first thumbnail_item
     const image: ImageModel = {
-      imageId: 0,
+      imageId: 1,
       category: ev.category,
       url: '',
       blob: '',
@@ -136,6 +136,7 @@ export class HomeComponent implements OnInit, OnDestroy {
     this.store.dispatch(new SetSelectedImageById(image));
     // Enable display the first image in the main window
     this.store.dispatch(new SetIsImageLoaded({idx: 0}));
+    this.store.dispatch(new SetImageUrls([]))
   }
   onSelectItem( ev: any) {
     // console.log('select item',ev);
@@ -148,13 +149,12 @@ export class HomeComponent implements OnInit, OnDestroy {
     this.splitMode = ev.mode;
     this.store.dispatch(new SetSplitAction(true));
     this.splitService.selectedElement = ev;
-    this.cdr.detectChanges();
   }
   thumbnailWorkerProcess() {
     // this.getImageUrls$.pipe(
     this.currentCategory$.pipe().subscribe(val => {
       this.category = val;
-      // console.log('-- category -1', val)
+      console.log('-- category -1', val)
     });
     this.getImageUrls$.pipe(
       takeUntil(this.unsubscribe$),
@@ -163,7 +163,7 @@ export class HomeComponent implements OnInit, OnDestroy {
       this.currentImages = this.imageService.cachedThumbnailImages.map(val => val.image)
         .filter(val =>  val.category === this.category)
         .map( (v: any) => {
-          // console.log('this.currentImages -2', this.category, v.imageId)
+          console.log('-- category -2 getImageUrls$ this.currentImages', this.category, v.imageId)
           return {item: v}
         });
         this.cdr.detectChanges();

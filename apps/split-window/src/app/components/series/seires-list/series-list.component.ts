@@ -90,29 +90,18 @@ export class SeriesListComponent implements OnInit {
   onSelectSeries(ev: SeriesModel) {
     if( !ev) return;
     // console.log( '--- onSelectSeries-list id', ev )
-    this.selectSeries.emit(ev);
     //
     // this.setSelectedSeriesToTopPosition(ev);
-    this.addClass = {
-      class: 'selected_item',
-      index: ev.seriesId
-    }
-    setTimeout(() => this.viewPort.scrollToIndex(ev.seriesId, 'smooth'), 200);    /**
+    /**
      * To synchronize with the current selected Series, after when it is activated by clicking Series-list
      * */
     localStorage.setItem('selectedSeriesId', JSON.stringify({series:ev}));
-  }
-  /**
-   * Assign selected series at the first position
-   * */
-  private setSelectedSeriesToTopPosition(ev: SeriesModel) {
-    this.tmpSeries = []
-    this.tmpSeries = [...this._currentSeries]
-    const index = this.tmpSeries.findIndex( val => val.category === ev.category)
-    let series = this.tmpSeries.splice(index, 1);
-    this.tmpSeries.unshift(series[0])
-    this._currentSeries = [...this.tmpSeries];
-    const categories = this.tmpSeries.map( v => v.category);
-    this.store.dispatch( new SetCategoryList(categories))
+    this.selectSeries.emit(ev);
+    this.addClass = {
+      class: 'selected_item',
+      category: ev.category
+    }
+    this.cdr.detectChanges();
+    setTimeout(() => this.viewPort.scrollToIndex(ev.seriesId, 'smooth'), 200);
   }
 }

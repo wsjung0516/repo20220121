@@ -62,21 +62,21 @@ export class SeriesItemComponent implements  AfterViewInit, OnChanges {
   }
   ngOnChanges(changes: SimpleChanges) {
     this.borderColor = 'none_selected_item'
-    this.cdr.markForCheck();
+    this.cdr.detectChanges();
 
     // @ts-ignore
     const selectedId = localStorage.getItem('selectedSeriesId')
     // console.log('selectedId', selectedId, this._seriesImage)
     this.selectedSeriesId = selectedId && JSON.parse(selectedId).series;
-    // console. log('this.selectedImageId, this.originalImage.imageId ', this.selectedSeriesId.category, this._seriesImage.category)
+    // console. log('selectedImageId, this.originalImage.imageId ', this.selectedSeriesId.category, this._seriesImage.category)
     if( changes['addClass'] && changes['addClass'].currentValue) {
+     // console.log('series_Item changes', changes, this.selectedSeriesId.category, this._seriesImage.category)
       if( this.selectedSeriesId.category === this._seriesImage.category) {
         this.borderColor = 'selected_item';
-        this.cdr.markForCheck();
       } else {
         this.borderColor = 'non_selected_item';
-        this.cdr.markForCheck();
       }
+      this.cdr.detectChanges();
     }
   }
 }

@@ -31,12 +31,12 @@ const Template: Story<SeriesItemComponent> = (args) => ({
 export const Default = Template.bind({});
 Default.args = {
   seriesImage: {
-    series: {
+    // series: {
       seriesId: 0,
       url: '',
       blob: 'assets/sample_images/128.png',
       category: 'animal'
-    }
+    // }
   },
 }
 const initial_value = {
@@ -56,12 +56,12 @@ Default.play = async () => {
 export const SelectedSeries = Template.bind({});
 SelectedSeries.args = {
   seriesImage: {
-    series: {
+    // series: {
       seriesId: 1,
       url: '',
       blob: 'assets/sample_images/128.png',
       category: 'animal'
-    }
+    // }
   },
   addClass: 'aa'
 }

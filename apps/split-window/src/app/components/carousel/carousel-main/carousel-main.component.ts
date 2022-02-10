@@ -16,6 +16,7 @@ import {defer, EMPTY, Observable, of, Subject, zip} from "rxjs";
 import {Select, Store} from "@ngxs/store";
 // import {StatusState} from "../../../store/status/status.state";
 import {
+  SetCurrentCategory,
   SetCurrentSplitOperation,
   SetImageUrls,
   SetIsImageLoaded,
@@ -78,7 +79,6 @@ export class CarouselMainComponent implements OnInit, AfterViewInit, OnDestroy {
   @Select(StatusState.getSelectedImageById) getSelectedImageById$: Observable<ImageModel>;
   @Select(StatusState.getSelectedSeriesById) getSelectedSeriesById$: Observable<number>;
   //
-  @SelectSnapshot(StatusState.getSplitState) getSplitState: string[];
   @SelectSnapshot(StatusState.getCurrentCategory) currentCategory: string;
   @SelectSnapshot(StatusState.getCategoryList) category_list: string[];
   @SelectSnapshot(StatusState.getWebworkerWorkingStatus) getWebworkerWorkingStatus: boolean;
@@ -89,6 +89,9 @@ export class CarouselMainComponent implements OnInit, AfterViewInit, OnDestroy {
   @SelectSnapshot(StatusState.getFocusedSplit) focusedSplitIdx: number;
   @Select(StatusState.getCurrentSplitOperation) getCurrentSplitOperation$: Observable<{}>;
   @Select(StatusState.getActiveSplit) activeSplit$: Observable<number>;
+  @SelectSnapshot(StatusState.getSplitCategories) splitCategories: string[];
+
+
   worker: Worker[] = [];
   unsubscribe = new Subject();
   unsubscribe$ = this.unsubscribe.asObservable();
@@ -136,6 +139,7 @@ export class CarouselMainComponent implements OnInit, AfterViewInit, OnDestroy {
 
     /** New process start whenever clinking series_item */
     this.getSelectedSeriesById$.pipe(
+      skip(1),
       tap(val => console.log('-- getSelecteeSeriesById$', val)),
       skip(1),
       takeUntil(this.unsubscribe$),
@@ -145,7 +149,7 @@ export class CarouselMainComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   private makingSplitWindowByGrid(eIdx: number) {
-    this.category = this.getSplitState[eIdx];
+    this.category = this.splitCategories[eIdx];
     this.splitIdx = eIdx;
     this._queryUrl = `assets/json/${this.category}.json`;
     this.categoryIdx = this.category_list.findIndex(val => val === this.category);
@@ -154,31 +158,41 @@ export class CarouselMainComponent implements OnInit, AfterViewInit, OnDestroy {
        this.splitService.resetSplitWindowProcessing();
     }
     this.requestRenderingSplitWindow$[this.splitService.selectedElement] = of(this.splitService.selectedElement).pipe(take(1));
-    console.log('----requestRenderingSplitWindow$', this.requestRenderingSplitWindow$, this.splitService.selectedElement, eIdx);
+    console.log('-- requestRenderingSplitWindow$', this.requestRenderingSplitWindow$, this.splitService.selectedElement, eIdx);
   }
 
   private makingSplitWindowBySelectedSeries(cIdx: number) {
-    this.category = this.category_list[cIdx];
-    this._queryUrl = `assets/json/${this.category}.json`;
-    this.categoryIdx = this.category_list.findIndex(val => val === this.category);
-    // console.log('makingSplitWindowBySelectedSeries ', this.category_list, cIdx, this.categoryIdx)
-    this.makingSplitWindow();
+    const category = this.category_list[cIdx];
+    // this.category = this.splitCategories[cIdx];
+    this.store.dispatch(new SetCurrentCategory(category));
+    // this.category = this.category_list[cIdx];
+    const queryUrl = `assets/json/${category}.json`;
+    // this._queryUrl = `assets/json/${this.category}.json`;
+    this.categoryIdx = this.category_list.findIndex(val => val === category);
+    // console.log('makingSplitWindowBySelectedSeries ', this.category, this.category_list, cIdx, this.categoryIdx)
+    this.makingSplitWindow(queryUrl, category);
   }
 
-  private makingSplitWindow() {
-    // console.log(' --- makingSplitWindow ');
-    this.webWorkerProcess();
-    this.getTotalImageList();
-    this.makeTheFirstImage();
+  private makingSplitWindow(queryUrl: string, category: string) {
+    console.log(' --- makingSplitWindow ', this.category);
+    this.webWorkerProcess(category);
+    this.getRemainedImageList(queryUrl);
+    this.makeTheFirstImage(category);
 
   }
 
 
-  private makeTheFirstImage() {
+  private makeTheFirstImage(category: string) {
     this.getIsImageLoaded$ && this.getIsImageLoaded$.pipe(skip(1),take(1))
       .subscribe(async () => {
-
-        await this.displayTheFirstImage();
+    console.log('makeTheFirst', category)
+        /**
+         * Finished drawing the first image of all the images that was read from Internet
+         * based on the category.
+         * Make the end signal and send it to the waiting state to make the next grid start to
+         * drawing.
+         * */
+        await this.displayTheFirstImage(category);
         await this.signalFinished();
       })
   }
@@ -201,7 +215,7 @@ export class CarouselMainComponent implements OnInit, AfterViewInit, OnDestroy {
     })
   }
 
-  private async displayTheFirstImage() {
+  private async displayTheFirstImage(category: string) {
     return new Promise( resolve => {
         this.splitService.isStartedRendering[this.splitService.selectedElement].next(this.splitService.selectedElement)
         /**
@@ -209,18 +223,21 @@ export class CarouselMainComponent implements OnInit, AfterViewInit, OnDestroy {
          * then borrow image from series list, which is already cached.
          * This technique is needed because image should be displayed immediately
          */
-        const tImage = this.carouselService.getSelectedImageById(this.category, 0);
-        if( tImage ) {
+        // const tImage = this.carouselService.getSelectedImageById(this.category, 0);
+        const tImage = this.carouselService.getSelectedImageById(category, 0);
+        if( tImage !== '' ) {
+    console.log('-- displaySplitWindowImage -1 image', category);
           this.displaySplitWindowImage(tImage)
         } else {
           const image = this.cacheSeriesService.getCachedSeriesByCat(this.category).blob;
           this.displaySplitWindowImage(image);
+    console.log('-- displaySplitWindowImage -2 image', category);
         }
         resolve('')
     })
   }
   private displaySplitWindowImage(image: any) {
-    console.log('-- displaySplitWindowImage this.focusedSplitIdx, this.splitIdx, this.splitAction', this.focusedSplitIdx, this.splitIdx, this.splitAction)
+    console.log('-- displaySplitWindowImage -3 this.focusedSplitIdx, this.splitIdx, this.splitAction', this.focusedSplitIdx, this.splitIdx, this.splitAction)
     if( this.splitIdx !== this.focusedSplitIdx && !this.splitAction) {
       return
     }
@@ -239,29 +256,32 @@ export class CarouselMainComponent implements OnInit, AfterViewInit, OnDestroy {
      * */
     if( this.splitAction === true ) {
       const splitIdx = this.splitService.elements.findIndex((val:any) => val === this.splitService.selectedElement)
-      // console.log(' splitIdx', splitIdx);
+      console.log(' displaySplitWindowImage -4 splitIdx', splitIdx);
       if( this.splitMode -1  === splitIdx)
         this.store.dispatch(new SetSplitAction(false));
     }
     //
   }
 
-  private getTotalImageList() {
-    this.imageService.getTotalImageList(this._queryUrl)
+  private getRemainedImageList(queryUrl: string) {
+    // this.imageService.getTotalImageList(this._queryUrl)
+    this.imageService.getTotalImageList(queryUrl)
       .subscribe((val: any) => {
-        const category = this._queryUrl && this._queryUrl.split('.')[0].split('/')[2];
+        const category = queryUrl.split('.')[0].split('/')[2];
+        //
         const urls = this.imageService.getCacheUrls();
         /** Try to display if there are any cached image before check additional loading  */
         this.store.dispatch(new SetImageUrls([]));
         //
         this.checkIfAdditionalLoading(val, category, urls).then((res: any) => {
-          // console.log('-- getTotalImageList remained url', res.length)
+          console.log('-- getTotalImageList remained url', category, res.length)
           if (res.length > 0) { // If there is remained url that need loading image
             this.imageCount[this.categoryIdx] = res.length;
-            /** Send urls for loading images additionally */
-            this.webworkerPostMessage(res);
+            /** Send urls to webworker for loading images additionally */
+            this.webworkerPostMessage(res, category);
           } else {
-            /** In this case, no webworker job is needed because all images are cached,
+            /**
+             * In this case, no webworker job is needed because all images are cached,
              *  And display the first image.
              */
             this.store.dispatch(new SetIsImageLoaded({idx:0}));
@@ -269,7 +289,6 @@ export class CarouselMainComponent implements OnInit, AfterViewInit, OnDestroy {
             /** Triggering loading every image, then thumbnail list is updated continuously */
             this.store.dispatch(new SetImageUrls([]));
           }
-
         });
       }, error => {
         throw Error(error)
@@ -296,12 +315,13 @@ export class CarouselMainComponent implements OnInit, AfterViewInit, OnDestroy {
     });
   }
 
-  private webworkerPostMessage(val: any) {
-    // console.log(' webworkerPostMessage-- val', val, val.length)
+  private webworkerPostMessage(val: any, cat: string) {
+    console.log(' webworkerPostMessage-- val', val, val.length, cat)
     const data: any = {
       msg: 'download',
       body: val,
-      category: this.category
+      category: cat
+      // category: this.category
     }
     /** Send source data to webworker, which is the base data that needs background job */
     if(this.worker[this.splitIdx]) this.worker[this.splitIdx].postMessage(data)
@@ -322,10 +342,10 @@ export class CarouselMainComponent implements OnInit, AfterViewInit, OnDestroy {
     const image = this.carouselService.getPrevImage(this.currentCategory, this.splitService.selectedElement);
     this.displaySplitWindowImage(image);
   }
-  private webWorkerProcess() {
+  private webWorkerProcess(category: string) {
     if (typeof Worker !== 'undefined') {
       if( !this.worker[this.splitIdx]) {
-        // console.log('this.worker[this.splitIdx]', this.worker[this.splitIdx], this.splitIdx)
+        // console.log(' worker[this.splitIdx]', this.worker[this.splitIdx], this.splitIdx)
         this.worker[this.splitIdx] = new Worker(new URL('../../../../assets/workers/carousel.worker.ts', import.meta.url));
         this.worker[this.splitIdx].onmessage = (data: any) => {
           this.progress[this.categoryIdx] = ((data.data.imageId + 1)/ this.imageCount[this.categoryIdx] * 100).toFixed(0).toString();
@@ -333,9 +353,10 @@ export class CarouselMainComponent implements OnInit, AfterViewInit, OnDestroy {
           const _data: any = {
             msg: 'completeCachedImage',
             body: data.data.url,
-            category: this.category
+            category: category
+            // category: this.category
           }
-          // console.log(' _data1',data.data.url)
+          console.log(' worker2', category, this.splitIdx)
           /** Send the signal of completing loading one image of all the images
            * that was sent to webworker as bundle urls
            * This means for being ready to receiving the next image*/
@@ -419,7 +440,7 @@ export class CarouselMainComponent implements OnInit, AfterViewInit, OnDestroy {
     // console.log(' tempObsevable, rendering$ -1', this.tempObservable, rendering$, this.splitService.selectedElement)
     // 8
     zip(this.tempObservable, rendering$).pipe( // 9
-      // tap( val => console.log(' tempObsevable, rendering$ -2', this.tempObservable, rendering$, this.categoryIdx)),
+      tap( val => console.log(' tempObsevable, rendering$ -2', this.tempObservable, rendering$, this.categoryIdx)),
       take(1),
     ).subscribe(([temp, element]) => {
       /** Start processing next window after finished processing for previous split window*/
@@ -428,7 +449,7 @@ export class CarouselMainComponent implements OnInit, AfterViewInit, OnDestroy {
       /** When change split mode, need to set the first signal to prepare processing
        * because each split window do process one by one */
       this.store.dispatch(new SetCurrentSplitOperation({element: this.splitService.selectedElement}));
-
+       console.log('categoryIdx splitWindowProcess2', this.category, this.categoryIdx);
       this.makingSplitWindowBySelectedSeries(this.categoryIdx); // 10
     });
   }

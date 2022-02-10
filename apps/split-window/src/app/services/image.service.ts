@@ -77,6 +77,7 @@ export class ImageService implements  OnDestroy {
   }
 
   getCacheImage(cat: string, idx: number) {
+    // console.log('getCacheImage', cat, idx)
     const cIdx: any = this.category_list.findIndex( val => val === cat) + 1;
     const nIdx = idx < 10 ? (cIdx * 10 + idx) : (cIdx * 100 + idx);
     const index = this._cachedImages.findIndex(image => image.idx === nIdx);

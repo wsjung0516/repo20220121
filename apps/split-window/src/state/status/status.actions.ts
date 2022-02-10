@@ -53,7 +53,7 @@ export class SetSplitMode {
   public static readonly type = '[Status] Set Window split';
   constructor(public payload: number ) { }
 }
-export class SetSplitState {
+export class SetSplitCategory {
   public static readonly type = '[Status] Set split state';
   constructor(public payload: {idx:number, category:string} ) { }
 }
