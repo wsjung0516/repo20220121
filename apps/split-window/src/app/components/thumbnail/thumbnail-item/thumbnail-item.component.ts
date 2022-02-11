@@ -43,7 +43,7 @@ import {StatusState} from "../../../../state/status/status.state";
 export class ThumbnailItemComponent implements OnInit, AfterViewInit {
   @ViewChild('img') image?: ElementRef;
   @Input() set addClass( v: any){
-    this.cdr.detectChanges();
+    this.cdr.markForCheck();
   }
   @Input() set originalImage (v : any ) {
     this._originalImage = v.item;

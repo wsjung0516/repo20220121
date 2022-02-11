@@ -75,7 +75,7 @@ export class HomeComponent implements OnInit, OnDestroy {
   @Select(StatusState.getSelectedGridTemplate) selectedGridTemplate$: Observable<ISelectedGridTemplate> | undefined;
   @Select(StatusState.getSeriesUrls) seriesUrls$: Observable<string[]>;
   @Select(StatusState.getCurrentCategory) currentCategory$: Observable<string>;
-  @Select(StatusState.getSelectedImageById)  getSelectedImageById$: Observable<ImageModel>;
+  // @Select(StatusState.getSelectedImageById)  getSelectedImageById$: Observable<ImageModel>;
   @SelectSnapshot(StatusState.getCategoryList)  category_list: string[];
 
   constructor(
@@ -88,13 +88,11 @@ export class HomeComponent implements OnInit, OnDestroy {
   ) { }
 
   ngOnInit(): void {
-    /** Display series list  */
+    /** Display thumbnail list  */
     this.thumbnailWorkerProcess();
+    /** Display series list  */
     this.seriesWorkerProcess();
-    // @ts-ignore
-    this.selectedGridTemplate$.pipe(takeUntil(this.unsubscribe$))
-      .subscribe( val => console.log( 'val', val))
-    // this.currentSeries = {seriesList:[]}
+    //
     this.initializeSeriesList();
   }
   /** Initializing selected series for the first time */
@@ -111,18 +109,21 @@ export class HomeComponent implements OnInit, OnDestroy {
       this.store.dispatch(new SetCurrentCategory('animal'));
     },1000);
   }
+  /** Select template by clicking one of the split windows */
   onSelectTemplate( ev: any ) {
     // {element: 'element4', idx: 3}
-    console.log( ' Home component -- onSelectTemplate',ev)
+    // console.log( ' Home component -- onSelectTemplate',ev)
     this.store.dispatch(new SetFocusedSplit(ev.idx));
     this.store.dispatch(new SetSplitAction(false));
   }
+  /** Select series item by clicking category list */
   onSelectSeries(ev: SeriesModel) {
     // console.log('onSelectSeries -2', this.currentSeries );
     this.store.dispatch(new SetSplitAction(false));
     this.splitService.currentImageIndex[this.splitService.selectedElement] = 0;
     // Setting the current selected category
     this.store.dispatch(new SetSplitCategory({idx: 0, category: ev.category}));
+    this.store.dispatch(new SetCurrentCategory( ev.category));
     // Select series and get the image list.
     this.store.dispatch(new SetSelectedSeriesById(ev.seriesId));
     // Focusing the first thumbnail_item
@@ -138,12 +139,14 @@ export class HomeComponent implements OnInit, OnDestroy {
     this.store.dispatch(new SetIsImageLoaded({idx: 0}));
     this.store.dispatch(new SetImageUrls([]))
   }
+  /** Select thumbnail item */
   onSelectItem( ev: any) {
     // console.log('select item',ev);
     this.store.dispatch(new SetSelectedImageById(ev));
     this.cdr.detectChanges();
     this.store.dispatch(new SetSplitAction(false));
   }
+  /** Select split mode by clicking grid menu */
   onSelectMode( ev: any) {
     console.log(' splitMode', ev);
     this.splitMode = ev.mode;
@@ -154,7 +157,7 @@ export class HomeComponent implements OnInit, OnDestroy {
     // this.getImageUrls$.pipe(
     this.currentCategory$.pipe().subscribe(val => {
       this.category = val;
-      console.log('-- category -1', val)
+      //console.log('-- cat5-4', val)
     });
     this.getImageUrls$.pipe(
       takeUntil(this.unsubscribe$),
@@ -163,7 +166,6 @@ export class HomeComponent implements OnInit, OnDestroy {
       this.currentImages = this.imageService.cachedThumbnailImages.map(val => val.image)
         .filter(val =>  val.category === this.category)
         .map( (v: any) => {
-          console.log('-- category -2 getImageUrls$ this.currentImages', this.category, v.imageId)
           return {item: v}
         });
         this.cdr.detectChanges();
@@ -201,10 +203,10 @@ export class HomeComponent implements OnInit, OnDestroy {
         // @ts-ignore
         fromWorker<{}, {}>(          () => this.seriesWorker, input$)
           .subscribe((data: any) => {
-           // console.log('--- series list - webWorkerProcess - data', data);
             /** read blob data */
             const series: any = this.imageService.readFile(data.blob)
             series.subscribe((obj: any) => {
+              // console.log('--- series list - webWorkerProcess - data', data.seriesId);
               data.blob = obj;
               this.cacheSeriesService.checkAndCacheSeries(data);
               this.store.dispatch(new SetIsSeriesLoaded(true));

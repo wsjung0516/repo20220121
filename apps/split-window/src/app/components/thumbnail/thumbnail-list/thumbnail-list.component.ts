@@ -4,7 +4,7 @@ import {
   ChangeDetectorRef,
   Component, EventEmitter,
   Injectable,
-  Input,
+  Input, OnDestroy,
   OnInit, Output,
   ViewChild
 } from '@angular/core';
@@ -16,6 +16,9 @@ import {
   FixedSizeVirtualScrollStrategy,
   VIRTUAL_SCROLL_STRATEGY
 } from "@angular/cdk/scrolling";
+import {Select} from "@ngxs/store";
+import {StatusState} from "../../../../state/status/status.state";
+import {Observable, Subject, takeUntil} from "rxjs";
 @Injectable()
 export class CustomVirtualScrollStrategy extends FixedSizeVirtualScrollStrategy {
   constructor() {
@@ -59,7 +62,7 @@ export class CustomVirtualScrollStrategy extends FixedSizeVirtualScrollStrategy 
   changeDetection: ChangeDetectionStrategy.OnPush
 
 })
-export class ThumbnailListComponent implements OnInit, AfterViewInit {
+export class ThumbnailListComponent implements OnInit, AfterViewInit, OnDestroy {
   @Input() set selectedImage (v: any){
     if( v ) {
       v && this.onSelectItem(v.item);
@@ -67,12 +70,16 @@ export class ThumbnailListComponent implements OnInit, AfterViewInit {
     }
   };
   @Input() set currentImages (im:  any) {
+    // console.log(' currentImages', im)
     this._currentImages = im;
     this.cdr.detectChanges();
   }
   @Output() selectItem = new EventEmitter<any>();
   @ViewChild(CdkVirtualScrollViewport, { static: true }) viewPort: CdkVirtualScrollViewport | undefined;
+  @Select(StatusState.getSelectedImageById)  getSelectedImageById$: Observable<ImageModel>;
   _currentImages: any;
+  unsubscribe = new Subject();
+  unsubscribe$ = this.unsubscribe.asObservable();
   addClass: {} = {};
   constructor(
     private cdr: ChangeDetectorRef,
@@ -90,6 +97,23 @@ export class ThumbnailListComponent implements OnInit, AfterViewInit {
     }
     localStorage.setItem('selectedImageId', JSON.stringify(initial_value));
 
+    /**
+     * Triggered from series-list.component ( onSelectSeries),
+     *      carousel.service (getPrevImage, getNextImage)
+     */
+    this.getSelectedImageById$.pipe(
+      takeUntil(this.unsubscribe$)
+    ).subscribe( image => {
+      this.addClass = {
+        class:'selected_item',
+        imageId: image.imageId
+      }
+      localStorage.setItem('selectedImageId', JSON.stringify({item: image}));
+
+      this.cdr.detectChanges();
+      // To synchronize with the current selected item, after when it is activated by clicking item-list
+      setTimeout(() => this.viewPort.scrollToIndex(image.imageId, 'smooth'),200);
+    })
     ///
   }
   ngAfterViewInit() {
@@ -119,5 +143,9 @@ export class ThumbnailListComponent implements OnInit, AfterViewInit {
       }
       this.cdr.detectChanges();
     },200);
+  }
+  ngOnDestroy() {
+    this.unsubscribe.next({});
+    this.unsubscribe.complete();
   }
 }
