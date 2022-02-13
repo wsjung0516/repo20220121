@@ -259,7 +259,7 @@ export class CarouselMainComponent implements OnInit, AfterViewInit, OnDestroy {
      * */
     if( this.splitAction === true ) {
       const splitIdx = this.splitService.elements.findIndex((val:any) => val === this.splitService.selectedElement)
-      console.log(' displaySplitWindowImage -4 splitIdx', splitIdx);
+      // console.log(' displaySplitWindowImage -4 splitIdx', splitIdx);
       if( this.splitMode -1  === splitIdx)
         this.store.dispatch(new SetSplitAction(false));
     }
@@ -389,10 +389,12 @@ export class CarouselMainComponent implements OnInit, AfterViewInit, OnDestroy {
      * When it comes to rendering of split-windows,
      * each window need to wait until the previous window finished rendering.
      * -----------------
-     * 1. The end of processing of image, emit event of "isStartedRendering$" for each split window.
-     * 2. As soon as take the event of "isStartedRendering$" start processing .
-     * 3. display the first image and emit event of "isFinishedRendering$"
-     *    for each split window.
+     * 1. The end of processing of image in one of the split windows,
+     *    emit event of "isStartedRendering$" for each split window.
+     * 2. As soon as take the event of "isStartedRendering$" the next split window start processing .
+     * 3. This split window display the first image only and emit event of "isFinishedRendering$"
+     *    ,which means the next split window that was waiting the "isFinishedRendering" of previous
+     *    split window is about to start processing.
      * */
       //
     const isFinished$ = this.getCurrentSplitOperation$.pipe( // 1 To know the end of image processing

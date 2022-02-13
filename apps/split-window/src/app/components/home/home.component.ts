@@ -41,7 +41,7 @@ import {SplitService} from "../../services/split.service";
         <div class="mt-1">
           <div class="grid grid-cols-10 gap-2">
             <div class="h-auto col-span-1 bg-blue-100">
-              <h2 class="mx-3 mt-2">Category</h2>
+              <div class="mx-3 mt-2 mb-2 text-xl font-bold font-weight: 900">Category</div>
               <series-list [currentSeries]="currentSeries"
                             [selectedSeries]="selectedSeries"
                             (selectSeries)="onSelectSeries($event)">
@@ -145,10 +145,11 @@ export class HomeComponent implements OnInit, OnDestroy {
     this.store.dispatch(new SetSelectedImageById(ev));
     this.cdr.detectChanges();
     this.store.dispatch(new SetSplitAction(false));
+    this.splitService.currentImageIndex[this.splitService.selectedElement] = ev.imageId;
   }
   /** Select split mode by clicking grid menu */
   onSelectMode( ev: any) {
-    console.log(' splitMode', ev);
+    // console.log(' splitMode', ev);
     this.splitMode = ev.mode;
     this.store.dispatch(new SetSplitAction(true));
     this.splitService.selectedElement = ev;

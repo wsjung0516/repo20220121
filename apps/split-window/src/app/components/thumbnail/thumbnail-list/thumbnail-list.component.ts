@@ -81,6 +81,9 @@ export class ThumbnailListComponent implements OnInit, AfterViewInit, OnDestroy 
   unsubscribe = new Subject();
   unsubscribe$ = this.unsubscribe.asObservable();
   addClass: {} = {};
+  draggedInx = 0;
+  idx = 0;
+
   constructor(
     private cdr: ChangeDetectorRef,
   ) { }
@@ -96,7 +99,6 @@ export class ThumbnailListComponent implements OnInit, AfterViewInit, OnDestroy 
       }
     }
     localStorage.setItem('selectedImageId', JSON.stringify(initial_value));
-
     /**
      * Triggered from series-list.component ( onSelectSeries),
      *      carousel.service (getPrevImage, getNextImage)
