@@ -42,11 +42,11 @@ export class SeriesItemComponent implements  AfterViewInit, OnChanges {
     if( this.image) {
       this.image.nativeElement.src = this._seriesImage.blob;
     }
-    this.cdr.detectChanges();
+    this.cdr.markForCheck();
   };
   // @Input() seriesImage: SeriesModel;
   @Input() set addClass( v: any){
-    this.cdr.detectChanges();
+    this.cdr.markForCheck();
   }
   @Output() selected: EventEmitter<any> = new EventEmitter();
   _seriesImage: SeriesModel;

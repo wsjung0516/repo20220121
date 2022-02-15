@@ -50,7 +50,7 @@ export class ThumbnailItemComponent implements OnInit, AfterViewInit {
     if( this.image && this.image.nativeElement) {
       // console.log(' thumbnail_item originalImage',v.item)
       this.image.nativeElement.src = this._originalImage.blob;
-      this.cdr.detectChanges();
+      this.cdr.markForCheck();
     }
   }
   @Output() selected: EventEmitter<ImageModel> = new EventEmitter<ImageModel>();

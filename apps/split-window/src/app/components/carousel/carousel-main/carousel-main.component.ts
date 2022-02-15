@@ -347,6 +347,8 @@ export class CarouselMainComponent implements OnInit, AfterViewInit, OnDestroy {
         this.worker[this.splitIdx] = new Worker(new URL('../../../../assets/workers/carousel.worker.ts', import.meta.url));
         this.worker[this.splitIdx].onmessage = (data: any) => {
           this.progress[this.categoryIdx] = ((data.data.imageId + 1)/ this.imageCount[this.categoryIdx] * 100).toFixed(0).toString();
+          this.cdr.markForCheck();
+          // console.log('progress', this.progress, this.categoryIdx)
           this.makeCachedImage(data.data);
           const _data: any = {
             msg: 'completeCachedImage',
@@ -394,7 +396,7 @@ export class CarouselMainComponent implements OnInit, AfterViewInit, OnDestroy {
      * 2. As soon as take the event of "isStartedRendering$" the next split window start processing .
      * 3. This split window display the first image only and emit event of "isFinishedRendering$"
      *    ,which means the next split window that was waiting the "isFinishedRendering" of previous
-     *    split window is about to start processing.
+     *    split window need to start processing.
      * */
       //
     const isFinished$ = this.getCurrentSplitOperation$.pipe( // 1 To know the end of image processing

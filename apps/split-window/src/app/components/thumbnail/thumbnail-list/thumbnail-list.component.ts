@@ -66,13 +66,13 @@ export class ThumbnailListComponent implements OnInit, AfterViewInit, OnDestroy 
   @Input() set selectedImage (v: any){
     if( v ) {
       v && this.onSelectItem(v.item);
-      this.cdr.detectChanges();
+      this.cdr.markForCheck();
     }
   };
   @Input() set currentImages (im:  any) {
     // console.log(' currentImages', im)
     this._currentImages = im;
-    this.cdr.detectChanges();
+    this.cdr.markForCheck();
   }
   @Output() selectItem = new EventEmitter<any>();
   @ViewChild(CdkVirtualScrollViewport, { static: true }) viewPort: CdkVirtualScrollViewport | undefined;
@@ -112,7 +112,7 @@ export class ThumbnailListComponent implements OnInit, AfterViewInit, OnDestroy 
       }
       localStorage.setItem('selectedImageId', JSON.stringify({item: image}));
 
-      this.cdr.detectChanges();
+      this.cdr.markForCheck();
       // To synchronize with the current selected item, after when it is activated by clicking item-list
       setTimeout(() => this.viewPort.scrollToIndex(image.imageId, 'smooth'),200);
     })
