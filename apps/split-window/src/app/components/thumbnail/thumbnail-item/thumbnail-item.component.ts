@@ -77,17 +77,15 @@ export class ThumbnailItemComponent implements OnInit, AfterViewInit {
 
     // @ts-ignore
     this.selectedImageId = JSON.parse(localStorage.getItem('selectedImageId')).item;
-    // console.log('data2 this.selectedImageId', this.selectedImageId)
+    // console.log('data2 this.selectedImageId', changes['addClass'].currentValue.imageId, this.selectedImageId.imageId, this._originalImage.imageId)
     if( changes['addClass'] && changes['addClass'].currentValue) {
       // @ts-ignore
       if( this.selectedImageId.imageId === this._originalImage.imageId) {
-      // if( this.selectedImageId && this.selectedImageId.imageId === this._originalImage.imageId) {
         this.borderColor = 'selected_item';
-        this.cdr.markForCheck();
       } else {
         this.borderColor = 'non_selected_item';
-        this.cdr.markForCheck();
       }
+      this.cdr.markForCheck();
     }
   }
 }

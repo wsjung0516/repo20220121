@@ -12,7 +12,7 @@ import {
 } from '@angular/core';
 import {CarouselService} from "../../../services/carousel.service";
 import {ImageService} from "../../../services/image.service";
-import {defer, EMPTY, Observable, of, Subject, zip} from "rxjs";
+import {defer, EMPTY, from, Observable, of, Subject, zip} from "rxjs";
 import {Select, Store} from "@ngxs/store";
 // import {StatusState} from "../../../store/status/status.state";
 import {
@@ -23,7 +23,7 @@ import {
   SetSelectedSplitWindowId,
   SetSplitAction,
 } from "../../../../state/status/status.actions";
-import {filter, skip, switchMap, take, takeUntil, tap} from "rxjs/operators";
+import {filter, skip, switchMap, take, takeUntil, tap, toArray} from "rxjs/operators";
 import {SelectSnapshot} from "@ngxs-labs/select-snapshot";
 import {fromWorker} from "observable-webworker";
 import {StatusState} from "../../../../state/status/status.state";
@@ -93,13 +93,13 @@ export class CarouselMainComponent implements OnInit, AfterViewInit, OnDestroy {
   @SelectSnapshot(StatusState.getSplitCategories) splitCategories: string[];
 
 
-  worker: Worker[] = [];
+  private worker: Worker[] = [];
   unsubscribe = new Subject();
   unsubscribe$ = this.unsubscribe.asObservable();
-  _queryUrl: string;
+  private _queryUrl: string;
   categoryIdx: any = 0;
-  splitIdx = 0;
-  imageCount: any[] = [];
+  private splitIdx = 0;
+  private imageCount: any[] = [];
   progress: string[] = [];
   originalImage: any;
   requestRenderingSplitWindow$: Observable<string>[] = [];
@@ -159,8 +159,10 @@ export class CarouselMainComponent implements OnInit, AfterViewInit, OnDestroy {
 
   private makingSplitWindowByGrid(eIdx: number) {
     const category = this.splitCategories[eIdx];
+    /**
+     *  Initialize each split window private value.
+     */
     this.splitIdx = eIdx;
-    // console.log( ' cat5', category);
     this._queryUrl = `assets/json/${category}.json`;
     this.categoryIdx = this.category_list.findIndex(val => val === category);
     this.splitService.selectedElement = this.splitService.elements[eIdx];
@@ -176,12 +178,10 @@ export class CarouselMainComponent implements OnInit, AfterViewInit, OnDestroy {
     //
     const queryUrl = `assets/json/${category}.json`;
     this.categoryIdx = this.category_list.findIndex(val => val === category);
-    // console.log(' cat5 - 9 makingSplitWindowBySelectedSeries ',  this.category_list, cIdx, this.categoryIdx)
     this.makingSplitWindow(queryUrl, category);
   }
 
   private makingSplitWindow(queryUrl: string, category: string) {
-    // console.log(' --- cat5 - 8  makingSplitWindow ', category);
     this.webWorkerProcess(category);
     this.getRemainedImageList(queryUrl);
     this.makeTheFirstImage(category);
@@ -277,6 +277,8 @@ export class CarouselMainComponent implements OnInit, AfterViewInit, OnDestroy {
         this.store.dispatch(new SetIsImageLoaded({idx:0}));
         //
         this.makeReadingRemainedImages(val, category, urls);
+        //
+
       }, error => {
         throw Error(error)
       });
@@ -285,7 +287,7 @@ export class CarouselMainComponent implements OnInit, AfterViewInit, OnDestroy {
 
   private makeReadingRemainedImages(val: any, category: string, urls: { idx: number; category: string; url: string }[]) {
     this.checkIfAdditionalLoading(val, category, urls).then((res: any) => {
-      // console.log(' cat5 - 3 getTotalImageList remained url', category, res, res.length)
+      // console.log(' cat5-6 webworkerPostMessage-- val',  this._queryUrl, category)
       if (res.length > 0) { // If there is remained url that need loading image
         this.imageCount[this.categoryIdx] = res.length;
         /** Send urls to webworker for loading images additionally */
@@ -315,7 +317,14 @@ export class CarouselMainComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   private webworkerPostMessage(val: any, category: string) {
-    // console.log(' cat5 - 7 webworkerPostMessage-- val', val, val.length, category)
+    /**
+     * While changing split mode, need to restrict webworker action,
+     * because active split index is different from webworker index,
+     * webworker is running until it's timeout 5 sec is end, while drawing
+     * the first image of each split window is finished already.
+     * */
+    if( this.splitAction ) return;
+    console.log(' cat5-7 webworkerPostMessage-- val', val, val.length,this._queryUrl, category)
     const data: any = {
       msg: 'download',
       body: val,
@@ -344,11 +353,11 @@ export class CarouselMainComponent implements OnInit, AfterViewInit, OnDestroy {
     if (typeof Worker !== 'undefined') {
       if( !this.worker[this.splitIdx]) {
         // console.log(' worker[this.splitIdx]', this.worker[this.splitIdx], this.splitIdx)
+        // console.log('cat5-81', this.categoryIdx, this.splitIdx)
         this.worker[this.splitIdx] = new Worker(new URL('../../../../assets/workers/carousel.worker.ts', import.meta.url));
         this.worker[this.splitIdx].onmessage = (data: any) => {
           this.progress[this.categoryIdx] = ((data.data.imageId + 1)/ this.imageCount[this.categoryIdx] * 100).toFixed(0).toString();
           this.cdr.markForCheck();
-          // console.log('progress', this.progress, this.categoryIdx)
           this.makeCachedImage(data.data);
           const _data: any = {
             msg: 'completeCachedImage',
@@ -449,7 +458,7 @@ export class CarouselMainComponent implements OnInit, AfterViewInit, OnDestroy {
       /** When change split mode, need to set the first signal to prepare processing
        * because each split window do process one by one */
       this.store.dispatch(new SetCurrentSplitOperation({element: this.splitService.selectedElement}));
-      // console.log('categoryIdx splitWindowProcess2',  this.categoryIdx);
+      // console.log('cat5-4 ',  this.categoryIdx);
       this.makingSplitWindowBySelectedSeries(this.categoryIdx); // 10
     });
   }

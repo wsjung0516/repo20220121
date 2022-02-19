@@ -11,6 +11,6 @@ export class AppComponent {
   progress = 0;
   // constructor(private http: HttpClient) {}
   onSelectedTemplate(ev : any) {
-    console.log(' AppComponent onSelectedTemplate ev', ev);
+    // console.log(' AppComponent onSelectedTemplate ev', ev);
   }
 }

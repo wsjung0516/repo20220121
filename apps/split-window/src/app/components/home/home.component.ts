@@ -77,6 +77,8 @@ export class HomeComponent implements OnInit, OnDestroy {
   @Select(StatusState.getCurrentCategory) currentCategory$: Observable<string>;
   // @Select(StatusState.getSelectedImageById)  getSelectedImageById$: Observable<ImageModel>;
   @SelectSnapshot(StatusState.getCategoryList)  category_list: string[];
+  @SelectSnapshot(StatusState.getSplitCategories)  split_category_list: string[];
+  @SelectSnapshot(StatusState.getFocusedSplit)  focusedSplit: number;
 
   constructor(
     private cacheSeriesService: CacheSeriesService,
@@ -115,14 +117,23 @@ export class HomeComponent implements OnInit, OnDestroy {
     // console.log( ' Home component -- onSelectTemplate',ev)
     this.store.dispatch(new SetFocusedSplit(ev.idx));
     this.store.dispatch(new SetSplitAction(false));
+
+    const category = this.split_category_list[ev.idx]
+    // console.log(' data1 - category', category);
+    this.store.dispatch(new SetCurrentCategory(category));
+    // this.store.dispatch(new SetSplitCategory({idx: ev.idx, category:category}));
+    // Trigger displaying thumbnail image
+    this.store.dispatch(new SetImageUrls([]));
+
   }
   /** Select series item by clicking category list */
   onSelectSeries(ev: SeriesModel) {
-    // console.log('onSelectSeries -2', this.currentSeries );
     this.store.dispatch(new SetSplitAction(false));
     this.splitService.currentImageIndex[this.splitService.selectedElement] = 0;
     // Setting the current selected category
-    this.store.dispatch(new SetSplitCategory({idx: 0, category: ev.category}));
+    this.store.dispatch(new SetSplitCategory({idx: this.focusedSplit, category: ev.category}));
+    // this.store.dispatch(new SetSplitCategory({idx: 0, category: ev.category}));
+    // console.log('data2 onSelectSeries -2', ev.category, this.split_category_list, this.focusedSplit );
     this.store.dispatch(new SetCurrentCategory( ev.category));
     // Select series and get the image list.
     this.store.dispatch(new SetSelectedSeriesById(ev.seriesId));
@@ -135,22 +146,32 @@ export class HomeComponent implements OnInit, OnDestroy {
       title: ''
     }
     this.store.dispatch(new SetSelectedImageById(image));
-    // Enable display the first image in the main window
-    this.store.dispatch(new SetIsImageLoaded({idx: 0}));
+    // Make signal the first image is loaded,
+    // which can be the starting point of processing for the next split window
+    this.store.dispatch(new SetIsImageLoaded({idx: this.focusedSplit}));
+    // Trigger displaying thumbnail image
     this.store.dispatch(new SetImageUrls([]))
   }
-  /** Select thumbnail item */
+  /** Select thumbnail item by clicking  */
   onSelectItem( ev: any) {
     // console.log('select item',ev);
     this.store.dispatch(new SetSelectedImageById(ev));
     this.cdr.detectChanges();
+    // If splitAction is true, it's time to change split mode so need to stop changing
+    // image selection.
     this.store.dispatch(new SetSplitAction(false));
     this.splitService.currentImageIndex[this.splitService.selectedElement] = ev.imageId;
   }
-  /** Select split mode by clicking grid menu */
+  /** Select split mode by clicking grid menu in the toolbar */
   onSelectMode( ev: any) {
     // console.log(' splitMode', ev);
+    /**
+     *  Selecting splitMode trigger display-grid.component. --> display-grid-template.component -->
+     *  grid-template.directive --> grid-template.component --> carousel-main.component
+     */
     this.splitMode = ev.mode;
+    // If splitAction is true, it's time to change split mode so need to stop changing
+    // image selection.
     this.store.dispatch(new SetSplitAction(true));
     this.splitService.selectedElement = ev;
   }
@@ -165,7 +186,9 @@ export class HomeComponent implements OnInit, OnDestroy {
     ).subscribe(() => {
       this.currentImages = [];
       this.currentImages = this.imageService.cachedThumbnailImages.map(val => val.image)
-        .filter(val =>  val.category === this.category)
+        .filter(val =>  {
+          return val.category === this.category
+        })
         .map( (v: any) => {
           return {item: v}
         });

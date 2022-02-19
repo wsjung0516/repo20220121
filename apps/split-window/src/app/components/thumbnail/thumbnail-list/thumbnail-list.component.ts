@@ -106,15 +106,18 @@ export class ThumbnailListComponent implements OnInit, AfterViewInit, OnDestroy 
     this.getSelectedImageById$.pipe(
       takeUntil(this.unsubscribe$)
     ).subscribe( image => {
-      this.addClass = {
-        class:'selected_item',
-        imageId: image.imageId
-      }
-      localStorage.setItem('selectedImageId', JSON.stringify({item: image}));
 
-      this.cdr.markForCheck();
       // To synchronize with the current selected item, after when it is activated by clicking item-list
-      setTimeout(() => this.viewPort.scrollToIndex(image.imageId, 'smooth'),200);
+      localStorage.setItem('selectedImageId', JSON.stringify({item: image}));
+      setTimeout(() => {
+      // console.log(' data1 -', image.imageId)
+        this.viewPort.scrollToIndex(image.imageId, 'smooth')
+        this.addClass = {
+          class:'selected_item',
+          imageId: image.imageId
+        }
+      this.cdr.markForCheck();
+      },200);
     })
     ///
   }
