@@ -48,7 +48,6 @@ export class ThumbnailItemComponent implements OnInit, AfterViewInit {
   @Input() set originalImage (v : any ) {
     this._originalImage = v.item;
     if( this.image && this.image.nativeElement) {
-      // console.log(' thumbnail_item originalImage',v.item)
       this.image.nativeElement.src = this._originalImage.blob;
       this.cdr.markForCheck();
     }

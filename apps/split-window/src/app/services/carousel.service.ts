@@ -20,11 +20,15 @@ export class CarouselService {
     private store: Store
     ) {}
   getNextImage(cat: string, element: any) {
-    if( this.imageService.getCacheUrlsByCategory(cat).length > this.splitService.currentImageIndex[element] + 1) {
-      this.splitService.currentImageIndex[element] = this.splitService.currentImageIndex[element] + 1;
+    if( this.imageService.getCacheUrlsByCategory(cat).length > this.splitService.currentImageIndex[cat] + 1) {
+      this.splitService.currentImageIndex[cat] = this.splitService.currentImageIndex[cat] + 1;
     }
+    // if( this.imageService.getCacheUrlsByCategory(cat).length > this.splitService.currentImageIndex[element] + 1) {
+    //   this.splitService.currentImageIndex[element] = this.splitService.currentImageIndex[element] + 1;
+    // }
     const image: ImageModel = {
-      imageId: this.splitService.currentImageIndex[element],
+      imageId: this.splitService.currentImageIndex[cat],
+      // imageId: this.splitService.currentImageIndex[element],
       category: cat,
       url: '',
       blob: '',
@@ -38,16 +42,21 @@ export class CarouselService {
 
     this.store.dispatch(new SetSelectedImageById(image));
     //
-    return this.imageService.getCacheImage(cat, this.splitService.currentImageIndex[element]);
-    // return this.imageService.getCacheImage(this.category, this.currentImageIndex);
+    return this.imageService.getCacheImage(cat, this.splitService.currentImageIndex[cat]);
+    // return this.imageService.getCacheImage(cat, this.splitService.currentImageIndex[element]);
+    //
   }
   getPrevImage(cat: string, element: any) {
-    if( this.splitService.currentImageIndex[element] > 0) {
-      this.splitService.currentImageIndex[element] = this.splitService.currentImageIndex[element] - 1;
+    if( this.splitService.currentImageIndex[cat] > 0) {
+      this.splitService.currentImageIndex[cat] = this.splitService.currentImageIndex[cat] - 1;
     }
+    // if( this.splitService.currentImageIndex[element] > 0) {
+    //   this.splitService.currentImageIndex[element] = this.splitService.currentImageIndex[element] - 1;
+    // }
     // console.log('-- prev this.currentImageIndex', this.currentImageIndex )
     const image: ImageModel = {
-      imageId: this.splitService.currentImageIndex[element],
+      imageId: this.splitService.currentImageIndex[cat],
+      // imageId: this.splitService.currentImageIndex[element],
       category: cat,
       url: '',
       blob: '',
@@ -55,10 +64,12 @@ export class CarouselService {
     }
 
     this.store.dispatch(new SetSelectedImageById(image));
-    return this.imageService.getCacheImage(this.category, this.splitService.currentImageIndex[element]);
+    return this.imageService.getCacheImage(this.category, this.splitService.currentImageIndex[cat]);
+    // return this.imageService.getCacheImage(this.category, this.splitService.currentImageIndex[element]);
   }
   getSelectedImageByUrl(url: string, element: any) {
-    return this.imageService.getCacheImage(this.category, this.splitService.currentImageIndex[element])
+    // return this.imageService.getCacheImage(this.category, this.splitService.currentImageIndex[element])
+    // return this.imageService.getCacheImage(this.category, this.splitService.currentImageIndex[element])
   }
   getSelectedImageById(cat: string, idx: number) {
     return this.imageService.getCacheImage(cat, idx)

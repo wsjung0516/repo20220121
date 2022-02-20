@@ -1,11 +1,12 @@
 import {Injectable, OnDestroy} from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import {Observable, Subject} from 'rxjs';
-import { map} from 'rxjs/operators';
+import {Observable, of, Subject} from 'rxjs';
+import {map, tap} from 'rxjs/operators';
 import {ImageModel} from "../components/carousel/carousel-main/carousel-main.component";
 import {StatusState} from "../../state/status/status.state";
 import {SelectSnapshot} from "@ngxs-labs/select-snapshot";
 import {downscaleImage} from "../utils/down-scale-image";
+import {SetImageUrls, SetIsImageLoaded} from "../../state/status/status.actions";
 
 
 @Injectable({
@@ -105,6 +106,40 @@ export class ImageService implements  OnDestroy {
     })
 
   }
+  makeCachedImage(data: ImageModel): Observable<any>{
+    if(  !data.blob.type || !data.blob.size) {
+      // data is not Blob type.
+      return of(undefined);
+    }
+    const image: any = this.readFile(data.blob)
+    return image.pipe(
+      map((obj: any) =>  {
+        data.blob = obj;
+        this.checkAndCacheImage(data)
+        return data
+      }),
+      // tap( val => console.log('data1', val)),
+    )
+/*
+    image.subscribe((obj: any) => {
+      data.blob = obj;
+      // console.log('---- data2 category', data.imageId, data.category)
+      // this.saveCacheImage(data);
+      this.checkAndCacheImage(data)
+    })
+*/
+  }
+
+/*
+  saveCacheImage(data: ImageModel) {
+    this.checkAndCacheImage(data)
+    /!** Triggering that every image is loading, then thumbnail list is updated continuously *!/
+    this.store.dispatch(new SetImageUrls([data.url]));
+    /!** To show the first image in the main window *!/
+    this.store.dispatch(new SetIsImageLoaded({idx:data.imageId}));
+  }
+*/
+
   readFile (blob: any): Observable<string>  {
     return new Observable((obs: any) => {
       const reader = new FileReader();

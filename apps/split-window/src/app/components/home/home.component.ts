@@ -75,7 +75,7 @@ export class HomeComponent implements OnInit, OnDestroy {
   @Select(StatusState.getSelectedGridTemplate) selectedGridTemplate$: Observable<ISelectedGridTemplate> | undefined;
   @Select(StatusState.getSeriesUrls) seriesUrls$: Observable<string[]>;
   @Select(StatusState.getCurrentCategory) currentCategory$: Observable<string>;
-  // @Select(StatusState.getSelectedImageById)  getSelectedImageById$: Observable<ImageModel>;
+  //
   @SelectSnapshot(StatusState.getCategoryList)  category_list: string[];
   @SelectSnapshot(StatusState.getSplitCategories)  split_category_list: string[];
   @SelectSnapshot(StatusState.getFocusedSplit)  focusedSplit: number;
@@ -119,27 +119,41 @@ export class HomeComponent implements OnInit, OnDestroy {
     this.store.dispatch(new SetSplitAction(false));
 
     const category = this.split_category_list[ev.idx]
-    // console.log(' data1 - category', category);
     this.store.dispatch(new SetCurrentCategory(category));
     // this.store.dispatch(new SetSplitCategory({idx: ev.idx, category:category}));
     // Trigger displaying thumbnail image
     this.store.dispatch(new SetImageUrls([]));
+    //
+    this.selectedSeries = {
+      seriesId: 0,
+      url: '',
+      blob: '',
+      category: category
+    }
+    localStorage.setItem('selectedSeriesId',JSON.stringify({series:this.selectedSeries}));
+    this.cdr.detectChanges();
+    // Select series and get the image list.
+    const seriesId = this.category_list.findIndex( val => val === category);
+    /** Select series and update thumbnail item */
+    this.store.dispatch(new SetSelectedSeriesById(seriesId));
 
   }
   /** Select series item by clicking category list */
   onSelectSeries(ev: SeriesModel) {
     this.store.dispatch(new SetSplitAction(false));
-    this.splitService.currentImageIndex[this.splitService.selectedElement] = 0;
+    this.splitService.currentImageIndex[ev.category] = 0;
+    // this.splitService.currentImageIndex[this.splitService.selectedElement] = 0;
     // Setting the current selected category
     this.store.dispatch(new SetSplitCategory({idx: this.focusedSplit, category: ev.category}));
     // this.store.dispatch(new SetSplitCategory({idx: 0, category: ev.category}));
     // console.log('data2 onSelectSeries -2', ev.category, this.split_category_list, this.focusedSplit );
     this.store.dispatch(new SetCurrentCategory( ev.category));
     // Select series and get the image list.
+    /** Select series and update thumbnail item */
     this.store.dispatch(new SetSelectedSeriesById(ev.seriesId));
     // Focusing the first thumbnail_item
     const image: ImageModel = {
-      imageId: 1,
+      imageId: 0,
       category: ev.category,
       url: '',
       blob: '',
@@ -155,12 +169,14 @@ export class HomeComponent implements OnInit, OnDestroy {
   /** Select thumbnail item by clicking  */
   onSelectItem( ev: any) {
     // console.log('select item',ev);
+    this.store.dispatch(new SetSplitAction(false));
     this.store.dispatch(new SetSelectedImageById(ev));
     this.cdr.detectChanges();
     // If splitAction is true, it's time to change split mode so need to stop changing
     // image selection.
-    this.store.dispatch(new SetSplitAction(false));
-    this.splitService.currentImageIndex[this.splitService.selectedElement] = ev.imageId;
+    this.splitService.currentImageIndex[ev.category] = ev.imageId;
+    // this.splitService.currentImageIndex[this.splitService.selectedElement] = ev.imageId;
+    console.log('data1', this.splitService.currentImageIndex)
   }
   /** Select split mode by clicking grid menu in the toolbar */
   onSelectMode( ev: any) {
@@ -181,6 +197,9 @@ export class HomeComponent implements OnInit, OnDestroy {
       this.category = val;
       //console.log('-- cat5-4', val)
     });
+    /**
+     * Whenever update imageUrl, thumbnail list is updated.
+     * */
     this.getImageUrls$.pipe(
       takeUntil(this.unsubscribe$),
     ).subscribe(() => {
@@ -203,7 +222,7 @@ export class HomeComponent implements OnInit, OnDestroy {
         this.currentSeries = {series:[]} ;
         // this.cacheSeriesService.cachedSeries.map( v => this.currentSeries.seriesList.push(v));
         this.currentSeries.series = [...this.cacheSeriesService.cachedSeries]
-        this.cdr.detectChanges();
+        // this.cdr.detectChanges();
         // console.log(' this.currentSeries', this.currentSeries)
       })
     ).subscribe()

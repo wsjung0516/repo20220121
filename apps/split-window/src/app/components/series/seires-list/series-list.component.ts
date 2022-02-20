@@ -56,7 +56,8 @@ import {Store} from "@ngxs/store";
 export class SeriesListComponent implements OnInit {
   _currentSeries : any[];
   @Input() set selectedSeries (v: any){
-    // this.onSelectSeries(v);
+    // console.log('data2', v);
+    v && this.addClassFn(v);
   };
   @Input() set currentSeries (se:  any) {
     if( se ) {
@@ -90,18 +91,24 @@ export class SeriesListComponent implements OnInit {
   onSelectSeries(ev: SeriesModel) {
     if( !ev) return;
     // console.log( '--- onSelectSeries-list id', ev )
-    //
-    // this.setSelectedSeriesToTopPosition(ev);
     /**
      * To synchronize with the current selected Series, after when it is activated by clicking Series-list
      * */
-    localStorage.setItem('selectedSeriesId', JSON.stringify({series:ev}));
     this.selectSeries.emit(ev);
-    this.addClass = {
-      class: 'selected_item',
-      category: ev.category
-    }
-    this.cdr.detectChanges();
-    setTimeout(() => this.viewPort.scrollToIndex(ev.seriesId, 'smooth'), 200);
+    localStorage.setItem('selectedSeriesId', JSON.stringify({series:ev}));
+    this.addClassFn(ev);
+  }
+
+  private addClassFn(ev: SeriesModel) {
+    setTimeout(() => {
+      this.addClass = {
+        class: 'selected_item',
+        category: ev.category
+      }
+      this.cdr.detectChanges();
+      // console.log ('ev', ev)
+      if( ev.seriesId === 1) ev.seriesId = 0;
+      this.viewPort.scrollToIndex(ev.seriesId, 'smooth')
+    }, 200);
   }
 }

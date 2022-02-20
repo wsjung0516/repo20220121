@@ -94,7 +94,7 @@ export class ThumbnailListComponent implements OnInit, AfterViewInit, OnDestroy 
         imageId: 1,
         category: 'animal',
         url: '',
-        blob: 'assets/sample_images/100.jpg',
+        blob: '',
         title: ''
       }
     }

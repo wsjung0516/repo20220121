@@ -29,7 +29,7 @@ import {ImageModel, SeriesModel} from "@repo20220121/data";
     }
     .selected_item {
       width: auto;
-      border: blue solid 4px ;
+      border: red solid 4px ;
     }
   `],
    changeDetection: ChangeDetectionStrategy.OnPush}
