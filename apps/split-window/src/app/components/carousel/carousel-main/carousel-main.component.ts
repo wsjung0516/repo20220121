@@ -30,6 +30,7 @@ import {StatusState} from "../../../../state/status/status.state";
 import {SeriesItemService} from "../../series/series-item.service";
 import {CacheSeriesService} from "../../../services/cashe-series.service";
 import {SplitService} from "../../../services/split.service";
+import {isString} from "@nestjs/common/utils/shared.utils";
 
 // export const category_list = ['animal', 'house', 'baby', 'forest', 'happiness', 'love', 'sea','banana', 'mountain']
 export interface ImageModel {
@@ -46,7 +47,7 @@ export interface ImageModel {
     <div>
       <div class="w-auto h-auto">
         <div class="m-1">
-          <mat-progress-bar mode="determinate" [value]="progress[categoryIdx]"></mat-progress-bar>
+          <mat-progress-bar mode="determinate" [value]="progress[category]"></mat-progress-bar>
         </div>
         <div class="">
           <div class="m-1">
@@ -91,16 +92,18 @@ export class CarouselMainComponent implements OnInit, AfterViewInit, OnDestroy {
   @Select(StatusState.getCurrentSplitOperation) getCurrentSplitOperation$: Observable<{}>;
   @Select(StatusState.getActiveSplit) activeSplit$: Observable<number>;
   @SelectSnapshot(StatusState.getSplitCategories) splitCategories: string[];
+  @Select(StatusState.getSplitCategories) splitCategories$: Observable<string[]>;
 
 
   private worker: Worker[] = [];
   unsubscribe = new Subject();
   unsubscribe$ = this.unsubscribe.asObservable();
   private _queryUrl: string;
+  category: string = 'animal';
   categoryIdx: any = 0;
   private splitIdx = 0;
-  private imageCount: any[] = [];
-  progress: string[] = [];
+  private imageCount: {[key:string]:number} = {};
+  progress: {[key:string]:string} = {};
   originalImage: any;
   requestRenderingSplitWindow$: Observable<string>[] = [];
   selectedSplitWindow = new Subject<string>();
@@ -154,16 +157,23 @@ export class CarouselMainComponent implements OnInit, AfterViewInit, OnDestroy {
     ).subscribe((id: number) => {
       this.makingSplitWindowBySelectedSeries(id);
     });
+    /** Trigger from home.component when clicking selec */
+    this.splitCategories$.pipe(
+      skip(1),
+      takeUntil(this.unsubscribe$),
+    ).subscribe( category_list => {
+      this.category = category_list[this.splitIdx];
+    })
   }
 
   private makingSplitWindowByGrid(eIdx: number) {
-    const category = this.splitCategories[eIdx];
+    this.category = this.splitCategories[eIdx];
     /**
      *  Initialize private values of each split window .
      */
     this.splitIdx = eIdx;
-    this._queryUrl = `assets/json/${category}.json`;
-    this.categoryIdx = this.category_list.findIndex(val => val === category);
+    this._queryUrl = `assets/json/${this.category}.json`;
+    this.categoryIdx = this.category_list.findIndex(val => val === this.category);
     this.splitService.selectedElement = this.splitService.elements[eIdx];
     if (this.splitMode === 1) {
        this.splitService.resetSplitWindowProcessing();
@@ -287,7 +297,7 @@ export class CarouselMainComponent implements OnInit, AfterViewInit, OnDestroy {
     this.checkIfAdditionalLoading(val, category, urls).then((res: any) => {
       // console.log(' cat5-6 webworkerPostMessage-- val',  this._queryUrl, category)
       if (res.length > 0) { // If there is remained url that need loading image
-        this.imageCount[this.categoryIdx] = res.length;
+        this.imageCount[category] = res.length;
         /** Send urls to webworker for loading images additionally */
         this.webworkerPostMessage(res, category);
       } else {
@@ -350,11 +360,14 @@ export class CarouselMainComponent implements OnInit, AfterViewInit, OnDestroy {
   private webWorkerProcess(category: string) {
     if (typeof Worker !== 'undefined') {
       if( !this.worker[this.splitIdx]) {
-        // console.log(' worker[this.splitIdx]', this.worker[this.splitIdx], this.splitIdx)
         // console.log('cat5-81', this.categoryIdx, this.splitIdx)
         this.worker[this.splitIdx] = new Worker(new URL('../../../../assets/workers/carousel.worker.ts', import.meta.url));
         this.worker[this.splitIdx].onmessage = (data: any) => {
-          this.progress[this.categoryIdx] = ((data.data.imageId + 1) / this.imageCount[this.categoryIdx] * 100).toFixed(0).toString();
+          //this.progress[category] = ((data.data.imageId + 1) / this.imageCount[this.categoryIdx] * 100).toFixed(0);
+          const prog = ((data.data.imageId + 1) / this.imageCount[category] * 100).toFixed(0);
+          if(isString(prog)) this.progress[category] = prog;
+
+          console.log('category', this.progress, category, typeof prog);
           this.cdr.markForCheck();
           //
           this.makeCacheData(data);
@@ -374,7 +387,7 @@ export class CarouselMainComponent implements OnInit, AfterViewInit, OnDestroy {
       }
     }
   }
-
+  /** Save data into the cache */
   private makeCacheData(data: any) {
     this.imageService.makeCachedImage(data.data).pipe(takeUntil(this.unsubscribe$))
       .subscribe(data => {
