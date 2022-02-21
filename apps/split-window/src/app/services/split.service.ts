@@ -15,6 +15,8 @@ export class SplitService {
   /** Each category has image id, which is changed by clicking thumbnail item and by
    * clicking previous arrow key  and next arrow key */
   currentImageIndex: {[key:string]: number} = {};
+  imageCount: {[key:string]:number} = {};
+  progress: {[key:string]:number} = {};
 
   isFinishedRendering: {[key:string]: Subject<any>} = {};
   isFinishedRendering$: {[key:string]: Observable<any>} = {};

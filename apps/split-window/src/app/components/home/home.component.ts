@@ -114,11 +114,11 @@ export class HomeComponent implements OnInit, OnDestroy {
   /** Select template by clicking one of the split windows */
   onSelectTemplate( ev: any ) {
     // {element: 'element4', idx: 3}
-    // console.log( ' Home component -- onSelectTemplate',ev)
     this.store.dispatch(new SetFocusedSplit(ev.idx));
     this.store.dispatch(new SetSplitAction(false));
 
     const category = this.split_category_list[ev.idx]
+    // console.log( ' Home component -- onSelectTemplate',ev, this.splitService.currentImageIndex[category])
     this.store.dispatch(new SetCurrentCategory(category));
     // this.store.dispatch(new SetSplitCategory({idx: ev.idx, category:category}));
     // Trigger displaying thumbnail image
@@ -131,6 +131,9 @@ export class HomeComponent implements OnInit, OnDestroy {
       category: category
     }
     localStorage.setItem('selectedSeriesId',JSON.stringify({series:this.selectedSeries}));
+    // Mark bolder line for the  selected thumbnail item
+    const selectedImageIdx = this.splitService.currentImageIndex[category];
+    this.selectedImage = {item:{imageId: selectedImageIdx, url:'', blob:'', title:'', category: this.category}}
     this.cdr.detectChanges();
     // Select series and get the image list.
     const seriesId = this.category_list.findIndex( val => val === category);
@@ -175,8 +178,7 @@ export class HomeComponent implements OnInit, OnDestroy {
     // If splitAction is true, it's time to change split mode so need to stop changing
     // image selection.
     this.splitService.currentImageIndex[ev.category] = ev.imageId;
-    // this.splitService.currentImageIndex[this.splitService.selectedElement] = ev.imageId;
-    console.log('data1', this.splitService.currentImageIndex)
+    // console.log('data1', this.splitService.currentImageIndex)
   }
   /** Select split mode by clicking grid menu in the toolbar */
   onSelectMode( ev: any) {
@@ -191,6 +193,7 @@ export class HomeComponent implements OnInit, OnDestroy {
     this.store.dispatch(new SetSplitAction(true));
     this.splitService.selectedElement = ev;
   }
+  /** Display thumbnail item, whenever event triggering */
   thumbnailWorkerProcess() {
     // this.getImageUrls$.pipe(
     this.currentCategory$.pipe().subscribe(val => {
@@ -198,7 +201,7 @@ export class HomeComponent implements OnInit, OnDestroy {
       //console.log('-- cat5-4', val)
     });
     /**
-     * Whenever update imageUrl, thumbnail list is updated.
+     * Whenever imageUrl is updated from carousel-main.component, thumbnail list is updated.
      * */
     this.getImageUrls$.pipe(
       takeUntil(this.unsubscribe$),
@@ -214,6 +217,7 @@ export class HomeComponent implements OnInit, OnDestroy {
         this.cdr.detectChanges();
     });
   }
+  /** Display series image upon receiving series images that are updated by the webworker process */
   seriesWorkerProcess() {
     this.seriesUrls$.pipe(
       skip(1),
@@ -234,6 +238,9 @@ export class HomeComponent implements OnInit, OnDestroy {
       this.seriesWorkerSubProcess();
     }
   }
+  /**
+   * Use webworker to not wait until series images are loaded
+   * */
   private seriesWorkerSubProcess() {
     /** Start series web worker with the initial values */
     this.seriesItemService.getSeriesObject()

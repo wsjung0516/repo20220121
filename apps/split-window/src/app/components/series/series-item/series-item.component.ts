@@ -68,7 +68,7 @@ export class SeriesItemComponent implements  AfterViewInit, OnChanges {
     const selectedId = localStorage.getItem('selectedSeriesId')
     // console.log('selectedId', selectedId, this._seriesImage)
     this.selectedSeriesId = selectedId && JSON.parse(selectedId).series;
-    // console. log('selectedImageId, this.originalImage.imageId ', this.selectedSeriesId.category, this._seriesImage.category)
+    // console. log('selectedImageId, ', this.selectedSeriesId.category, this._seriesImage.category)
     if( changes['addClass'] && changes['addClass'].currentValue) {
      // console.log('series_Item changes', changes, this.selectedSeriesId.category, this._seriesImage.category)
       if( this.selectedSeriesId.category === this._seriesImage.category) {

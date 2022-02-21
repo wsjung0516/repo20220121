@@ -9,6 +9,7 @@ import {MatMenuModule} from "@angular/material/menu";
 import {ScrollingModule} from "@angular/cdk/scrolling";
 import {MatIconModule} from "@angular/material/icon";
 import {MatTooltipModule} from "@angular/material/tooltip";
+import {MatProgressSpinnerModule} from "@angular/material/progress-spinner";
 const materials = [
   MatRadioModule,
   MatButtonModule,
@@ -18,7 +19,8 @@ const materials = [
   MatMenuModule,
   ScrollingModule,
   MatIconModule,
-  MatTooltipModule
+  MatTooltipModule,
+  MatProgressSpinnerModule
 ]
 
 @NgModule({

@@ -7,9 +7,10 @@ import {AngularMaterialsModule} from "../../../../shared/angular-materials.modul
 import {NgxsModule} from "@ngxs/store";
 import {NgxsSelectSnapshotModule} from "@ngxs-labs/select-snapshot";
 import {StatusState} from "../../../state/status/status.state";
+import { CarouselMainDisplayComponent } from './carousel-main/carousel-main-display/carousel-main-display.component';
 
 @NgModule({
-  declarations: [CarouselMainComponent],
+  declarations: [CarouselMainComponent, CarouselMainDisplayComponent],
   imports: [
     CommonModule,
     HttpClientModule,

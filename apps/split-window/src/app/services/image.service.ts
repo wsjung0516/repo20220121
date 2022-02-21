@@ -120,25 +120,7 @@ export class ImageService implements  OnDestroy {
       }),
       // tap( val => console.log('data1', val)),
     )
-/*
-    image.subscribe((obj: any) => {
-      data.blob = obj;
-      // console.log('---- data2 category', data.imageId, data.category)
-      // this.saveCacheImage(data);
-      this.checkAndCacheImage(data)
-    })
-*/
   }
-
-/*
-  saveCacheImage(data: ImageModel) {
-    this.checkAndCacheImage(data)
-    /!** Triggering that every image is loading, then thumbnail list is updated continuously *!/
-    this.store.dispatch(new SetImageUrls([data.url]));
-    /!** To show the first image in the main window *!/
-    this.store.dispatch(new SetIsImageLoaded({idx:data.imageId}));
-  }
-*/
 
   readFile (blob: any): Observable<string>  {
     return new Observable((obs: any) => {
