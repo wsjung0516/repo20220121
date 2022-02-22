@@ -124,8 +124,9 @@ export class HomeComponent implements OnInit, OnDestroy {
     // Trigger displaying thumbnail image
     this.store.dispatch(new SetImageUrls([]));
     //
+    const idx = this.category_list.findIndex(val => val === category);
     this.selectedSeries = {
-      seriesId: 0,
+      seriesId: idx,
       url: '',
       blob: '',
       category: category

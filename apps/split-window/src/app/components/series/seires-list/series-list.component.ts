@@ -90,7 +90,6 @@ export class SeriesListComponent implements OnInit {
   tmpSeries: any[];
   onSelectSeries(ev: SeriesModel) {
     if( !ev) return;
-    // console.log( '--- onSelectSeries-list id', ev )
     /**
      * To synchronize with the current selected Series, after when it is activated by clicking Series-list
      * */
@@ -105,8 +104,8 @@ export class SeriesListComponent implements OnInit {
         class: 'selected_item',
         category: ev.category
       }
-      this.cdr.detectChanges();
       // console.log ('ev', ev)
+      this.cdr.detectChanges();
       if( ev.seriesId === 1) ev.seriesId = 0;
       this.viewPort.scrollToIndex(ev.seriesId, 'smooth')
     }, 200);

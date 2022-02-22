@@ -245,6 +245,7 @@ export class CarouselMainComponent implements OnInit, AfterViewInit, OnDestroy {
          */
         const tImage = this.carouselService.getSelectedImageById(category, this.splitService.currentImageIndex[category]);
         if( tImage !== '' ) {
+          // console.log('image-1', this.splitService.currentImageIndex[category])
           // send data to the child component, carousel-main-display.component.
           this.image = tImage;
           this.progress = {
