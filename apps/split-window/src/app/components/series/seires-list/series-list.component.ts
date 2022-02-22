@@ -72,11 +72,11 @@ export class SeriesListComponent implements OnInit {
     private cdr: ChangeDetectorRef,
     private cacheSeriesService: CacheSeriesService,
     private store: Store
-) { }
+  ) {}
   ngOnInit(): void {
     const initial_value = {
       series: {
-        seriesId: 1,
+        seriesId: 0,
         url: '',
         blob: '',
         category: 'animal'
@@ -104,9 +104,7 @@ export class SeriesListComponent implements OnInit {
         class: 'selected_item',
         category: ev.category
       }
-      // console.log ('ev', ev)
       this.cdr.detectChanges();
-      if( ev.seriesId === 1) ev.seriesId = 0;
       this.viewPort.scrollToIndex(ev.seriesId, 'smooth')
     }, 200);
   }

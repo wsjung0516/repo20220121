@@ -20,7 +20,8 @@ import { CarouselMainDisplayComponent } from './carousel-main/carousel-main-disp
     NgxsSelectSnapshotModule.forRoot(),
   ],
   exports: [
-    CarouselMainComponent
+    CarouselMainComponent,
+    CarouselMainDisplayComponent
   ],
   providers: [CarouselService, HttpClient]
 })

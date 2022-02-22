@@ -130,7 +130,7 @@ WithThumbnailList.args = {
   },
   selectedSeries: {
     series: {
-      seriesId: 1,
+      seriesId: 0,
       url: '',
       blob: 'assets/sample_images/128.png',
       category: 'animal'

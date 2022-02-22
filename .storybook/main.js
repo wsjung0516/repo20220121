@@ -5,6 +5,7 @@ module.exports = {
     '@storybook/addon-essentials',
     '@storybook/addon-actions',
     "@storybook/addon-interactions",
+    "@storybook/addon-notes",
     // "@storybook/addon-postcss",
   ],
   // uncomment the property below if you want to apply some webpack config globally

@@ -41,7 +41,7 @@ Default.args = {
 }
 const initial_value = {
   series: {
-    seriesId: 1,
+    seriesId: 0,
     url: '',
     blob: 'assets/sample_images/128.png',
     category: 'animal'
@@ -57,7 +57,7 @@ export const SelectedSeries = Template.bind({});
 SelectedSeries.args = {
   seriesImage: {
     // series: {
-      seriesId: 1,
+      seriesId: 0,
       url: '',
       blob: 'assets/sample_images/128.png',
       category: 'animal'

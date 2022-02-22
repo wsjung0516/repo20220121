@@ -14,7 +14,6 @@ import {ImageModel, SeriesModel} from "@repo20220121/data";
   selector: 'series-item',
   template: `
     <div class="mb-1 w-auto">
-<!--      <div class="{{borderColor}}" (click)="selected.emit(_seriesImage)">-->
       <div class="{{borderColor}}" (click)="selected.emit(_seriesImage)">
         <img #img>
       </div>

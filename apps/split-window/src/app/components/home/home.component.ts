@@ -100,7 +100,7 @@ export class HomeComponent implements OnInit, OnDestroy {
   /** Initializing selected series for the first time */
   initializeSeriesList() {
     const initial_value = {
-      seriesId: 1,
+      seriesId: 0,
       url: '',
       blob: '',
       category: 'animal'
